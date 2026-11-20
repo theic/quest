@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title data-i18n="Install Messaging Quest">Install Messaging Quest</title>
+<link rel="icon" href="/quest.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/fonts/fonts.css"><link rel="stylesheet" href="/pages.css">
+<link rel="stylesheet" href="/i18n/browser.css"><script type="module" src="/i18n/browser.js"></script><script type="module" src="/install.js"></script></head>
+<body>
+<header class="head">
+  <a class="logo" href="https://www.messaging.quest/"><img src="/quest.svg" alt="" width="36" height="32">messaging<span>.quest</span></a>
+  <span data-language-picker=""></span>
+</header>
+<main>
+  <p class="eyebrow" data-i18n="Setup">Setup</p>
+  <h1 data-i18n="Add Quest <em>to your Chrome.</em>">Add Quest <em>to your Chrome.</em></h1>
+  <p class="lede" data-i18n="Quest works in your own Chrome, where you're already signed in. It never asks for a password.">Quest works in your own Chrome, where you're already signed in. It never asks for a password.</p>
+
+  <ol class="cards two">
+    <li class="card">
+      <span class="step-n" aria-hidden="true">1</span>
+      <p class="where" data-i18n="On a computer, in Chrome">On a computer, in Chrome</p>
+      <h3 data-i18n="Add the Chrome extension">Add the Chrome extension</h3>
+      <p data-i18n="Pin it from the puzzle icon, so you can see when Quest is reading.">Pin it from the puzzle icon, so you can see when Quest is reading.</p>
+      <div class="actions">
+        <a class="pill pill-accent" href="https://chromewebstore.google.com/detail/messaging-quest/kojgkphccdbkkclgadbdheblpebmiapj" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5"></circle><circle cx="12" cy="12" r="3.6"></circle><path d="M12 8.4h9M8.9 13.8 4.4 6M15.1 13.8l-4.5 7.7"></path></g></svg>
+          <span data-i18n="Add to Chrome">Add to Chrome</span>
+        </a>
+        <button class="text-link" type="button" commandfor="install" command="show-modal" data-i18n="or install it from a zip">or install it from a zip</button>
+      </div>
+    </li>
+    <li class="card">
+      <span class="step-n" aria-hidden="true">2</span>
+      <p class="where">Telegram</p>
+      <h3 data-i18n="Connect">Connect</h3>
+      <p data-i18n="Then open the <b>Connect Chrome</b> link Quest sent you in Telegram, in Chrome.">Then open the <b>Connect Chrome</b> link Quest sent you in Telegram, in Chrome.</p>
+    </li>
+  </ol>
+
+  <p class="note"><a href="https://t.me/theicreator" target="_blank" rel="noopener" data-i18n="Stuck? Write to Serhii">Stuck? Write to Serhii</a></p>
+</main>
+
+<!-- Plan B, as on the landing (apps/web/public/index.html, #install); install.js opens it, copies and aims the asks. -->
+<dialog id="install" class="install" aria-labelledby="install-h" closedby="any">
+  <button class="install-close" type="button" commandfor="install" command="close" aria-label="Close" data-i18n-aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="m6 6 12 12M18 6 6 18"></path></svg></button>
+  <p class="eyebrow" data-i18n="Plan B">Plan B</p>
+  <h2 id="install-h" data-i18n="Install Quest from a zip">Install Quest from a zip</h2>
+  <ol class="install-steps">
+    <li><a class="pill pill-accent" href="https://www.messaging.quest/quest-extension.zip" download=""><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 3.5v11.5m-5-5 5 5 5-5M4.5 19.5h15"></path></svg><span data-i18n="Download the zip">Download the zip</span></a></li>
+    <li data-i18n="Unzip it. You get a folder named <code>quest-extension</code>.">Unzip it. You get a folder named <code>quest-extension</code>.</li>
+    <li><span data-i18n="Open <code>chrome://extensions</code> in Chrome and turn on <b>Developer mode</b> (top right).">Open <code>chrome://extensions</code> in Chrome and turn on <b>Developer mode</b> (top right).</span> <button class="text-link" type="button" data-copy="chrome://extensions" data-i18n="Copy the address">Copy the address</button></li>
+    <li data-i18n="Click <b>Load unpacked</b> and choose the <code>quest-extension</code> folder.">Click <b>Load unpacked</b> and choose the <code>quest-extension</code> folder.</li>
+    <li data-i18n="Pin it from the puzzle icon, so you can see when Quest is reading.">Pin it from the puzzle icon, so you can see when Quest is reading.</li>
+  </ol>
+  <p data-i18n="Then open the <b>Connect Chrome</b> link Quest sent you in Telegram, in Chrome.">Then open the <b>Connect Chrome</b> link Quest sent you in Telegram, in Chrome.</p>
+  <p class="install-note" data-i18n="A copy from a zip doesn't update itself the way the Web Store's does.">A copy from a zip doesn't update itself the way the Web Store's does.</p>
+  <div class="install-ask">
+    <p data-i18n="Stuck? Ask an assistant to take you through it:">Stuck? Ask an assistant to take you through it:</p>
+    <blockquote class="install-prompt" data-i18n="Help me add a Chrome extension from a zip, with Developer mode and Load unpacked. Go one step at a time and wait for me after each one. The zip is https://www.messaging.quest/quest-extension.zip">Help me add a Chrome extension from a zip, with Developer mode and Load unpacked. Go one step at a time and wait for me after each one. The zip is https://www.messaging.quest/quest-extension.zip</blockquote>
+    <div class="actions">
+      <a class="pill" data-ask="https://chatgpt.com/?q=" href="https://chatgpt.com/" target="_blank" rel="noopener"><span data-i18n="Ask ChatGPT">Ask ChatGPT</span> <span aria-hidden="true">↗</span></a>
+      <a class="pill" data-ask="https://claude.ai/new?q=" href="https://claude.ai/new" target="_blank" rel="noopener"><span data-i18n="Ask Claude">Ask Claude</span> <span aria-hidden="true">↗</span></a>
+      <button class="text-link" type="button" data-copy-from=".install-prompt" data-i18n="Copy the prompt">Copy the prompt</button>
+    </div>
+  </div>
+</dialog>
+</body></html>

@@ -1,0 +1,95 @@
+.mq { --lime: #c8f60f; --sleep: #a9cf0d; --void: #0b0c0b; --off: #5d6354; display: block; height: auto; overflow: visible; }
+.mq .disc { fill: #0f100d; }
+.mq .tile { fill: #0a0a0a; stroke: #24261f; stroke-width: 3; }
+.mq .body, .mq .pupil { fill: var(--lime); }
+.mq .iris, .mq .cut { fill: var(--void); }
+.mq .screen { fill: #19220a; }
+.mq .fx polyline { fill: none; stroke: var(--lime); stroke-width: 15; stroke-linecap: square; stroke-linejoin: miter; }
+.mq .fx .dot, .mq .spark { fill: var(--lime); }
+.mq .env { fill: var(--void); stroke: var(--lime); stroke-width: 9; stroke-linejoin: miter; }
+.mq .env-v { fill: none; stroke: var(--lime); stroke-width: 9; }
+.glow .rig { filter: drop-shadow(0 0 14px rgba(200, 246, 15, .34)); }
+
+.mq .fx, .mq .e-half, .mq .e-star, .mq .e-dash, .mq .letter { display: none; }
+.mq.s-sleep .look, .mq.s-news .look, .mq.s-off .look { display: none; }
+.mq.s-sleep .e-half, .mq.s-news .e-star, .mq.s-off .e-dash { display: inline; }
+.mq.s-sleep .fx-z, .mq.s-news .fx-spark, .mq.s-wait .fx-q, .mq.s-news .letter { display: inline; }
+.mq.s-sleep .body, .mq.s-sleep .pupil { fill: var(--sleep); }
+.mq.s-sleep .fx polyline { stroke: var(--sleep); }
+.glow.s-sleep .rig { filter: drop-shadow(0 0 7px rgba(200, 246, 15, .16)); }
+.mq.s-off .rig { filter: none; }
+.mq.s-off .body { fill: none; stroke: var(--off); stroke-width: 7; stroke-linejoin: miter; }
+.mq.s-off .pupil, .mq.s-off .cut { fill: var(--off); }
+.mq.s-off .screen { fill: #131410; }
+
+.mq .rig, .mq .lid, .mq .look, .mq .tuft, .mq .wing, .mq .bulb, .mq .e-half, .mq .e-star, .mq .letter, .mq .z, .mq .spark, .mq .q-in { transform-box: fill-box; transform-origin: 50% 50%; }
+.mq .rig { transform-origin: 50% 92%; }
+.mq .tuft { transform-origin: 85% 100%; }
+.mq .wing { transform-origin: 92% 96%; }
+.mq .e-half { transform-origin: 50% 100%; }
+.mq .letter { transform-origin: 50% 0; }
+
+.mq .lid { animation: mq-blink 5.2s infinite; }
+.mq.s-active .rig { animation: mq-bob 3.6s ease-in-out infinite; }
+.mq.m-owl.s-active .tuft { animation: mq-twitch 6.4s infinite; }
+.mq.m-bird.s-active .wing { animation: mq-flap 2.2s ease-in-out infinite; }
+.mq.m-bot .bulb { animation: mq-pulse 2.6s ease-in-out infinite; }
+
+.mq.s-search .rig { animation: mq-lean 2.8s ease-in-out infinite; }
+.mq.m-lens.s-search .rig { animation: mq-loupe 3.2s ease-in-out infinite; }
+.mq.s-search .look { animation: mq-scan 2.8s ease-in-out infinite; }
+.mq.m-bird.s-search .wing { animation: mq-flap .8s ease-in-out infinite; }
+.mq.m-bot.s-search .bulb { animation: mq-pulse .8s ease-in-out infinite; }
+
+.mq.s-news .rig { animation: mq-hop 1.5s cubic-bezier(.3, .7, .4, 1) infinite; }
+.mq.s-news .e-star { animation: mq-spin 1.5s ease-in-out infinite; }
+.mq.s-news .spark { animation: mq-twinkle 1.5s ease-in-out infinite; }
+.mq.s-news .spark.k1 { animation-delay: .25s; }
+.mq.s-news .spark.k2 { animation-delay: .5s; }
+.mq.m-owl.s-news .tuft { animation: mq-perk 1.5s ease-in-out infinite; }
+.mq.m-bird.s-news .wing { animation: mq-flap .45s ease-in-out infinite; }
+.mq.m-bird.s-news .letter { animation: mq-swing 1.5s ease-in-out infinite; }
+.mq.m-bot.s-news .bulb { animation: mq-flash .5s steps(1) infinite; }
+
+.mq.s-wait .rig { animation: mq-tilt 3.2s ease-in-out infinite; }
+.mq.s-wait .look { transform: translate(-9px, 7px); }
+.mq.s-wait .lid { animation-duration: 3.4s; }
+.mq.s-wait .q-in { animation: mq-float 2.4s ease-in-out infinite; }
+.mq.m-bot.s-wait .bulb { animation: none; }
+
+.mq.s-sleep .rig { animation: mq-breathe 4.8s ease-in-out infinite; }
+.mq.s-sleep .e-half { animation: mq-droop 4.8s ease-in-out infinite; }
+.mq.s-sleep .z { opacity: 0; animation: mq-z 3.6s linear infinite; }
+.mq.s-sleep .z.z2 { animation-delay: 1.2s; }
+.mq.s-sleep .z.z3 { animation-delay: 2.4s; }
+.mq.m-owl.s-sleep .tuft { transform: rotate(-12deg) scaleY(.86); }
+.mq.m-bird.s-sleep .wing { transform: rotate(-16deg) scale(.5); }
+.mq.m-bot.s-sleep .bulb { animation: none; opacity: .22; }
+
+.mq.s-off .rig { animation: mq-flicker 4.2s steps(1) infinite; }
+.mq.s-off .lid, .mq.s-off .bulb { animation: none; }
+
+.mq.still *, .mq.still { animation: none !important; }
+.mq.still .z { opacity: 1; }
+.mq.still .spark { transform: none; opacity: 1; }
+
+@keyframes mq-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes mq-blink { 0%, 90%, 100% { transform: scaleY(1); } 93% { transform: scaleY(.08); } 96% { transform: scaleY(1); } }
+@keyframes mq-twitch { 0%, 80%, 100% { transform: rotate(0); } 84% { transform: rotate(-9deg); } 88% { transform: rotate(4deg); } 92% { transform: rotate(0); } }
+@keyframes mq-flap { 0%, 100% { transform: rotate(6deg); } 50% { transform: rotate(-12deg) scaleY(.86); } }
+@keyframes mq-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes mq-flash { 0% { opacity: 1; } 50% { opacity: .15; } }
+@keyframes mq-lean { 0%, 100% { transform: translateX(-6px) rotate(-2deg); } 50% { transform: translateX(6px) rotate(2deg); } }
+@keyframes mq-loupe { 0%, 100% { transform: translate(-10px, -4px); } 25% { transform: translate(0, 5px); } 50% { transform: translate(10px, -4px); } 75% { transform: translate(0, 5px); } }
+@keyframes mq-scan { 0%, 100% { transform: translateX(-15px); } 50% { transform: translateX(15px); } }
+@keyframes mq-hop { 0%, 100% { transform: translateY(0) scale(1); } 20% { transform: translateY(-24px) scale(.97, 1.04); } 40% { transform: translateY(0) scale(1.05, .94); } 52% { transform: translateY(0) scale(1); } }
+@keyframes mq-spin { 0%, 100% { transform: rotate(0) scale(1); } 50% { transform: rotate(90deg) scale(1.12); } }
+@keyframes mq-twinkle { 0%, 100% { transform: scale(.2); opacity: 0; } 30% { transform: scale(1.1); opacity: 1; } 60% { transform: scale(.85); opacity: .85; } }
+@keyframes mq-perk { 0%, 100% { transform: scaleY(1); } 20% { transform: scaleY(1.18); } 40% { transform: scaleY(1); } }
+@keyframes mq-swing { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+@keyframes mq-tilt { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(-4deg); } }
+@keyframes mq-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes mq-breathe { 0%, 100% { transform: scale(1, 1) translateY(0); } 50% { transform: scale(1.02, .97) translateY(5px); } }
+@keyframes mq-droop { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.3); } }
+@keyframes mq-z { 0% { transform: translate(0, 0); opacity: 0; } 15% { opacity: 1; } 70% { opacity: 1; } 100% { transform: translate(-14px, -34px); opacity: 0; } }
+@keyframes mq-flicker { 0%, 100% { opacity: 1; } 7% { opacity: .35; } 9% { opacity: 1; } 52% { opacity: .55; } 54% { opacity: 1; } 56% { opacity: .4; } 58% { opacity: 1; } }

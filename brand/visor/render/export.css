@@ -1,0 +1,49 @@
+/* Loop lengths for export: every animation divides its loop, so the last
+   frame runs straight into the first. Loaded after base.css. */
+
+/* The bot photo: a 6 s Active loop, one glance around, one blink. */
+.pho .lid { animation-duration: 6s; }
+.pho.s-active .rig { animation-duration: 3s; }
+.pho.m-bot .bulb { animation-duration: 2s; }
+.pho.s-active .look { animation: mq-glance 6s ease-in-out infinite; }
+@keyframes mq-glance {
+  0%, 16% { transform: translate(0, 0); }
+  24%, 38% { transform: translate(15px, -3px); }
+  46%, 60% { transform: translate(-15px, 2px); }
+  68%, 100% { transform: translate(0, 0); }
+}
+
+/* Stickers: 3 s loops (Found someone is 1.5 s). */
+.stk .lid { animation-duration: 3s; }
+.stk.s-active .rig { animation-duration: 3s; }
+.stk.m-bot.s-active .bulb { animation-duration: 1.5s; }
+.stk.s-search .rig, .stk.s-search .look { animation-duration: 3s; }
+.stk.m-bot.s-search .bulb { animation-duration: .75s; }
+.stk.s-wait .rig, .stk.s-wait .lid { animation-duration: 3s; }
+.stk.s-wait .q-in { animation-duration: 1.5s; }
+.stk.s-sleep .rig, .stk.s-sleep .e-half, .stk.s-sleep .z { animation-duration: 3s; }
+.stk.s-sleep .z.z2 { animation-delay: 1s; }
+.stk.s-sleep .z.z3 { animation-delay: 2s; }
+.stk.s-off .rig { animation-duration: 3s; }
+/* Offline is drawn as an outline; on a sticker the inside is filled dark so the chat doesn't show through. */
+.stk.s-off .body { fill: #131410; }
+/* Offline greys, lifted a step so they still read on a dark chat. */
+.stk { --off: #7f8873; }
+/* Found someone, on the Visor: the ^^ eyes bounce with the hop instead of spinning. */
+.stk.m-bot.s-news .e-star { animation: mq-cheer 1.5s cubic-bezier(.3, .7, .4, 1) infinite; transform-origin: 50% 100%; }
+@keyframes mq-cheer { 0%, 100% { transform: translateY(0) scale(1); } 20% { transform: translateY(-7px) scale(1.12); } 40% { transform: translateY(0) scale(1, .9); } 52% { transform: translateY(0) scale(1); } }
+
+/* Stickers never fade: a faded shape over its dark edge reads as a grey ghost on a
+   light chat. Sparks and z's grow and shrink instead, with their dark copy under them;
+   the antenna light dims by brightness, so its edge stays solid. */
+.stk .under .fx polyline { stroke: #0b0c0b; stroke-width: 37; }
+.stk .under .spark, .stk .under .dot { fill: #0b0c0b; stroke: #0b0c0b; stroke-width: 22; stroke-linejoin: round; }
+.stk.s-news .spark { animation-name: mq-pop; }
+@keyframes mq-pop { 0%, 100% { transform: scale(0); } 30% { transform: scale(1.1); } 60% { transform: scale(.85); } 85% { transform: scale(0); } }
+.stk.s-sleep .z { opacity: 1; animation-name: mq-z-pop; }
+@keyframes mq-z-pop { 0% { transform: translate(0, 0) scale(0); } 15% { transform: translate(-2px, -5px) scale(1); } 75% { transform: translate(-10px, -25px) scale(1); } 100% { transform: translate(-14px, -34px) scale(0); } }
+.stk.m-bot.s-active .bulb, .stk.m-bot.s-search .bulb { animation-name: mq-dim; }
+.stk.m-bot.s-news .bulb { animation-name: mq-dim-flash; }
+@keyframes mq-dim { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(.4); } }
+@keyframes mq-dim-flash { 0% { filter: brightness(1); } 50% { filter: brightness(.25); } }
+.stk.m-bot.s-sleep .bulb { opacity: 1; filter: brightness(.3); }

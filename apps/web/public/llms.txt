@@ -1,0 +1,70 @@
+# Messaging Quest
+
+> Quest is an AI brand assistant for founders and makers: it builds your brand on autopilot while you build the product. It learns your work once, then every day it posts on your social networks in your own voice, answers your audience and your mentions, finds people asking for a tool like yours, gets you listed in directories and reports every evening on what worked. You talk to it in Telegram; it works in your own Chrome through a browser extension. It is open source (AGPL-3.0) and free to run yourself, on your own computer with the Claude or ChatGPT subscription you already have (https://github.com/theic/quest); or hosted by us, pay as you go with credit packs.
+
+Website: https://www.messaging.quest/ (also written messaging.quest). The assistant is called Quest; the company and site are Messaging Quest. It is not related to Meta Quest, Quest Software or Quest Diagnostics.
+
+## What Quest does
+
+- Your progress, posted: videos, photos and MRR (monthly recurring revenue) proof, shared as your product grows.
+- Every network, every day: X, LinkedIn, Reddit, Instagram, YouTube, TikTok, Threads, Facebook and any other site you're signed in to, from your own accounts and in your own voice.
+- Your avatar and voice: it makes your avatar and learns to write like you.
+- Talks to your audience: answers comments and messages the way you would.
+- Finds people asking: when someone asks publicly for a tool like yours, it answers.
+- Watches your mentions: spots your name anywhere and replies.
+- Gets you listed: applies to directories and launch sites for you.
+- Learns what works: tracks every post, keeps what wins and tries something new each week.
+
+You don't give it tasks every day. Once it has learned your work, it keeps going on its own and tells you every evening what it posted, what worked and what it tries next.
+
+## Why it works
+
+Quest is not a chatbot inside one app that gives you ideas; it does the work itself, as you.
+
+- Every network, favouring none: an assistant built into one network keeps you on that network. Quest has no network of its own, so it goes wherever your people are.
+- As you, from your own Chrome: cloud browsers get blocked or asked to prove they're human where acting as a person matters. Quest works in your Chrome, on the accounts you've had for years.
+- In public without getting banned: it reads each community's rules before it posts, and keeps its own rules learned on real accounts: one reply per post, never answering your own words, your product last, day limits on every network, and trust earned one kind of action at a time.
+- Customers, not posts: every person it brings is on record, from the first conversation through trials and active use to paying, with the post that started it.
+
+## Why not ChatGPT or Claude?
+
+They wait for your prompt; Quest grows your accounts. It knows what to do out of the box and does it without a prompt, day and night, rooting for your project; you could build something like it with Claude, with a lot of time and patience. Unlike them, Quest works every day without a prompt; likes, follows, posts and writes DMs as you; keeps long conversations going, if you allow it; watches for replies and tells you who answered; works on any site from your own accounts, with no refusals; and runs dozens of agents at once that remember everyone they meet.
+
+## How it works
+
+Run it yourself: ask your Claude Code or Codex to "install Quest from https://github.com/theic/quest and add the extension". It follows the repository's AGENTS.md: npm run setup, npm start, then the Chrome extension pairs with Quest on your computer. Everything stays on your computer except the public people it finds, which go to one shared list every Quest reads.
+
+Or hosted, with nothing to install:
+
+1. Add the Quest extension to Chrome on a computer, from the Chrome Web Store: https://chromewebstore.google.com/detail/messaging-quest/kojgkphccdbkkclgadbdheblpebmiapj. Quest works in your own Chrome, where you're already signed in, so it never asks for a password.
+2. Click its icon and press Start talking: tell it what you built. The bar at the top of its side panel pauses it at once. Telegram is optional: https://t.me/messagingquestbot?start=founder
+
+If the Web Store won't do, the same extension also installs from a zip: download https://www.messaging.quest/quest-extension.zip and unzip it (it makes a folder named quest-extension), open chrome://extensions in Chrome, turn on Developer mode (top right), click Load unpacked and choose the quest-extension folder, then pin Quest from the puzzle icon and open the Connect Chrome link Quest sends in Telegram. A copy from the zip does not update itself.
+
+You stay in charge: say "ask me first" and Quest shows you each message before it goes. It reads a community's rules before it posts there. Quest is an AI and says so.
+
+## Pricing
+
+Pay as you go, with no subscription, no card to start and no trial clock.
+
+- Free ($0): run it yourself from https://github.com/theic/quest, on your own Claude or ChatGPT subscription.
+- Hosted: $1 of credits to start, with no card, then credit packs of $20 or $100, paid once through Stripe, no subscription. Credits pay for the AI Quest uses for you. Your very first top-up comes with a bonus: $20 gives $25 of credits, $100 gives $140.
+
+## Questions
+
+- How do I trust what it writes? It asks before it posts, and learns how you write from what you change. Only once you've approved three replies on X, say, does it reply there on its own.
+- Will my accounts get banned? It posts the way a careful person does: minutes apart, a few new posts a day at most, one reply per thread, and your product only once someone is talking with you. When a site says no, it stops there.
+- Does my computer need to stay on? For posting, yes: Quest works in your Chrome. While Chrome is closed, whatever's ready waits and goes up once you're back. While it's connected, Quest keeps the computer awake, and its popup has a switch for that.
+- Can I stop it? Any time. The bar at the top of Quest's side panel pauses it, and nothing browses or posts until you resume.
+- Is it really free? On your own computer, yes: it thinks with the Claude or ChatGPT subscription you already pay for, and your chat and drafts stay there. The public people it finds go to one shared list that every Quest reads. Hosted Quest costs what its AI costs, with $1 to start.
+
+## Links
+
+- [Website](https://www.messaging.quest/): a timelapse of Quest at work, the founder's own accounts that Quest grows from zero (6.5x followers in the week to 2026-11-08), real replies it wrote and the answers they got, and the questions people ask
+- [Source code on GitHub](https://github.com/theic/quest)
+- [Start Quest in Telegram](https://t.me/messagingquestbot?start=founder)
+- [Reviews on G2](https://www.g2.com/products/messaging-quest/reviews)
+- [YouTube channel](https://www.youtube.com/@MessagingQuest)
+- The founder's accounts, run by Quest: [X](https://x.com/theIcreator), [Threads](https://www.threads.com/@serhiilahutin), [Instagram](https://www.instagram.com/serhiilahutin/), [TikTok](https://www.tiktok.com/@messaging_quest), [Bluesky](https://bsky.app/profile/theicreator.bsky.social), [Mastodon](https://mastodon.social/@serhiilahutin)
+- [Privacy policy](https://www.messaging.quest/privacy)
+- [Terms](https://www.messaging.quest/terms)

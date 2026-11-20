@@ -1,0 +1,13 @@
+{
+  "name": "@mq/web",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "description": "messaging.quest: the landing page, as static files in public/ with no build step. `npm run dev` previews it on the laptop.",
+  "scripts": {
+    "dev": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/serve.ts"
+  },
+  "devDependencies": {
+    "@mq/core": "*"
+  }
+}

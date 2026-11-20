@@ -1,0 +1,7 @@
+{
+  "name": "@mq/extension",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "description": "Messaging Quest for Chrome: Quest reads and works on the web in the customer's own Chrome. Plain files, no build step: load this folder unpacked to develop, and npm run extension:pack zips it for the Chrome Web Store."
+}

@@ -1,0 +1,35 @@
+{
+  "name": "messaging-quest-v2",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run test",
+    "dev": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/dev-agent.ts",
+    "env:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/env-check.ts",
+    "i18n:sync": "node scripts/sync-i18n.mjs",
+    "test:i18n-browser": "node scripts/check-i18n-browser.cjs",
+    "extension:pack": "node scripts/pack-extension.mjs",
+    "claude:login": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/claude-login.ts",
+    "start": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/start.ts",
+    "setup": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/setup.ts"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "@types/node": "^22.15.0",
+    "@types/pg": "^8.15.0",
+    "happy-dom": "^20.14.5",
+    "playwright": "^1.62.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.2"
+  }
+}

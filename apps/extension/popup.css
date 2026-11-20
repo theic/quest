@@ -1,0 +1,1041 @@
+/*
+ * The toolbar popup in the landing's look (apps/web/public/site.css): near-black, warm white,
+ * one acid-lime accent, DM Sans with JetBrains Mono for labels, pill buttons. The fonts are
+ * packaged (fonts/, SIL OFL), so opening the popup asks nothing of the network.
+ * Explanations stay one tap away: behind an (i) beside each switch, and under "How it works".
+ */
+@font-face {
+  font-family: "DM Sans";
+  src: url("fonts/dm-sans-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/jetbrains-mono-latin.woff2") format("woff2");
+  font-weight: 500 600;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+:root {
+  --bg: #0b0c0b;
+  --surface: #161715;
+  --card: linear-gradient(#1a1b18f0, #161715f0);
+  --ink: #e8e8dc;
+  --ink-soft: #c2c3b9;
+  --muted: #a4a59b;
+  --border: #ffffff1c;
+  --border-strong: #ffffff33;
+  --accent: #ceff32;
+  --on-accent: #161811;
+  --warn: #ffc24b;
+  --bad: #ff8a7a;
+  --sans: "DM Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  width: 380px;
+  margin: 0;
+  padding: 14px 16px 16px;
+  background: radial-gradient(90% 140px at 100% 0, #ceff3212, transparent), var(--bg);
+  color: var(--ink);
+  font: 14px/1.5 var(--sans);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+p {
+  margin: 0;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* The Visor and the name, as the landing's header has them; the language button sits at the end. */
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  direction: ltr;
+}
+.logo img {
+  margin-inline-end: 7px;
+}
+.logo span {
+  color: var(--accent);
+}
+.language-picker {
+  height: 30px;
+  padding: 0 10px;
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+}
+.language-picker:hover {
+  border-color: var(--accent);
+}
+.language-picker:has(select:focus-visible) {
+  outline-color: var(--accent);
+}
+
+/* Mono capitals for labels, as on the landing. */
+.badge,
+.meter p,
+summary {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 10.5px;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+/* No monospace font joins Arabic or draws Devanagari and Chinese well: those labels stay in the sans. */
+html:is([lang="ar"], [lang="hi"], [lang="zh"]) :is(.badge, .meter p, summary) {
+  font-family: var(--sans);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  max-width: 100%;
+  margin-bottom: 12px;
+  padding: 6px 13px 6px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: #0b0c0b99;
+  color: var(--ink-soft);
+}
+.badge > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.badge i {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+.badge.warn i {
+  background: var(--warn);
+  box-shadow: 0 0 10px var(--warn);
+}
+.badge.off i {
+  background: var(--muted);
+  box-shadow: none;
+}
+
+.activity {
+  margin-bottom: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.badge.warn + .activity {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.meter {
+  margin-bottom: 12px;
+}
+.meter p {
+  margin-bottom: 7px;
+  color: var(--muted);
+}
+.bar {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: #ffffff14;
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  box-shadow: 0 0 12px #ceff3280;
+  transition: width 0.4s;
+}
+
+/* Two switches in one card. The (i) shows what a switch does: on hover, on focus, or pinned by a click. */
+.settings {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+}
+.setting {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+}
+.setting + .setting {
+  border-top: 1px solid var(--border);
+}
+.setting label {
+  min-width: 0;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+}
+.info {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: help;
+  transition: color 0.2s, border-color 0.2s;
+}
+.info:hover,
+.info[aria-expanded="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.info svg {
+  width: 11px;
+  height: 11px;
+}
+.tip {
+  position: absolute;
+  z-index: 2;
+  inset-inline: 6px;
+  bottom: calc(100% - 4px);
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: #1d1e1b;
+  box-shadow: 0 16px 36px -10px #000;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.5;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+  pointer-events: none;
+}
+.info:not([data-hush]):hover ~ .tip,
+.info:not([data-hush]):focus-visible ~ .tip,
+.info[aria-expanded="true"] ~ .tip {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.toggle {
+  appearance: none;
+  flex: none;
+  position: relative;
+  width: 36px;
+  height: 20px;
+  margin: 0;
+  margin-inline-start: auto;
+  border-radius: 999px;
+  background: #ffffff14;
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform 0.2s, background 0.2s;
+}
+.toggle:checked {
+  background: var(--accent);
+  box-shadow: 0 0 14px -2px #ceff3270;
+}
+.toggle:checked::after {
+  transform: translateX(16px);
+  background: var(--on-accent);
+}
+html[dir="rtl"] .toggle::after {
+  left: auto;
+  right: 3px;
+}
+html[dir="rtl"] .toggle:checked::after {
+  transform: translateX(-16px);
+}
+.toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Spoilers: the longer story, and an unpacked build's server address. */
+details.more {
+  margin-top: 14px;
+}
+summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  list-style: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+summary::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid;
+  border-bottom: 1.5px solid;
+  transform: rotate(-45deg);
+  transition: transform 0.2s;
+}
+html[dir="rtl"] summary::before {
+  transform: rotate(135deg);
+}
+details[open] > summary::before {
+  transform: rotate(45deg);
+}
+summary:hover,
+details[open] > summary {
+  color: var(--ink);
+}
+details.more > p {
+  margin-top: 10px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.quiet {
+  width: 100%;
+  height: 40px;
+  margin-top: 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  transition: border-color 0.2s, color 0.2s;
+}
+.quiet:hover {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+/* Not connected yet: the code, or the way to Quest. */
+.lead {
+  margin-bottom: 14px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.lead b {
+  color: var(--ink);
+}
+form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+input:not(.toggle) {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 600 15px var(--mono);
+  letter-spacing: 0.1em;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:not(.toggle)::placeholder {
+  color: #a4a59b70;
+}
+input:not(.toggle):focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px #ceff3226;
+}
+details input {
+  width: 100%;
+  height: 36px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.go {
+  flex: none;
+  height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 8px 28px -10px #ceff3280;
+  color: var(--on-accent);
+  font-weight: 700;
+  transition: box-shadow 0.2s;
+}
+.go:hover {
+  box-shadow: 0 12px 32px -10px #ceff32a0;
+}
+.state {
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.state.bad {
+  color: var(--bad);
+}
+.text-link {
+  display: inline-flex;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.text-link:hover {
+  color: var(--accent);
+}
+[hidden] {
+  display: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* The chat (the founder, 2026-11-15: "Quest should mostly be reached through a conversation, not a page"): Your move on
+   top, the conversation under it, the box to write in last; the switches fold under Settings. */
+/* Quest on or off: a bar across the top of the panel that says which, with the one button that changes it. Paused, it
+   turns amber, so a glance tells (the founder, 2026-11-18: "more clear to understand and see"). */
+.power-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -14px -16px 0;
+  padding: 8px 16px;
+  border-bottom: 1px solid #ceff3240;
+  background: #ceff3214;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.power-bar i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+.power-bar span {
+  flex: 1;
+  min-width: 0;
+}
+.power-bar button {
+  flex: none;
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.power-bar button:hover {
+  border-color: var(--ink-soft);
+}
+.power-bar button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.power-bar.off {
+  border-bottom-color: var(--warn);
+  background: #ffc24b2e;
+  color: var(--warn);
+}
+.power-bar.off i {
+  border-radius: 2px;
+  background: var(--warn);
+  box-shadow: none;
+}
+.power-bar.off button {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.power-bar:not([hidden]) + header {
+  margin-top: 10px;
+}
+#telegram {
+  margin-top: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+#telegram-error {
+  margin: 6px 0 0;
+}
+.asks li .top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 22px;
+}
+.asks li .to {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--muted);
+  font-size: 12.5px;
+  text-decoration: none;
+}
+.asks li .to:not(:empty)::after {
+  content: " ↗";
+}
+.asks li .to:hover {
+  color: var(--accent);
+}
+.asks li .head {
+  margin-top: 2px;
+  color: var(--accent);
+  font: 500 10.5px var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.asks li .quote {
+  margin-top: 8px;
+  padding-inline-start: 10px;
+  border-inline-start: 2px solid var(--border-strong);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  cursor: pointer;
+}
+.asks li .quote.open {
+  -webkit-line-clamp: unset;
+}
+.asks li .words {
+  margin-top: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 9;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.asks li .words.open {
+  -webkit-line-clamp: unset;
+}
+.asks li .words blockquote {
+  margin: 4px 0;
+  padding-inline-start: 10px;
+  border-inline-start: 2px solid var(--border-strong);
+  color: var(--muted);
+}
+.asks li .words a,
+.chat a {
+  color: var(--accent);
+}
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+.acts button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+.acts button:hover:not(:disabled) {
+  border-color: var(--ink-soft);
+  color: var(--ink);
+}
+.acts button.main {
+  flex: 1;
+  min-height: 40px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 14px;
+}
+.acts button.main:hover:not(:disabled) {
+  background: #d9ff5c;
+  color: var(--on-accent);
+}
+.acts button:disabled {
+  opacity: 0.45;
+}
+.msg .buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.msg .buttons button,
+.msg .buttons a {
+  min-height: 28px;
+  padding: 3px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.msg .buttons :is(button, a):hover {
+  border-color: var(--accent);
+}
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 380px;
+  overflow-y: auto;
+  padding: 2px 2px 6px;
+  overscroll-behavior: contain;
+}
+.chat:empty::before {
+  content: "…";
+  margin: auto;
+  color: var(--muted);
+}
+.msg {
+  max-width: 86%;
+  padding: 7px 11px;
+  border-radius: 14px;
+  background: var(--surface);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13.5px;
+  line-height: 1.45;
+  position: relative;
+}
+.msg.you {
+  align-self: flex-end;
+  background: #ceff321f;
+  border-bottom-right-radius: 4px;
+}
+.msg.quest {
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+.msg.note {
+  align-self: center;
+  max-width: 100%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 2px 6px;
+}
+.msg .reaction {
+  position: absolute;
+  bottom: -9px;
+  inset-inline-start: -6px;
+  font-size: 13px;
+}
+.msg.typing {
+  color: var(--muted);
+  font-style: italic;
+}
+.line {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+/* The box to write in, as Telegram's: a bar across the foot of the panel, the words in it with no frame of their own, the
+   mic while it is empty and the send once there are words. It grows with them up to six lines, then scrolls. */
+.say {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 4px;
+  margin: 10px -16px -16px;
+  padding: 6px 8px 6px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.reply-to {
+  flex-basis: 100%;
+  margin: 2px 0 4px;
+  padding-inline-start: 8px;
+  border-inline-start: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 1.35;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.say textarea {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  max-height: 140px;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: 14px/20px var(--sans);
+  resize: none;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.say textarea::placeholder {
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.say textarea:focus {
+  outline: none;
+}
+.say .mic,
+.say .send {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+}
+.say .mic:hover {
+  color: var(--ink);
+  background: #ffffff0f;
+}
+.say .send {
+  display: none;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.say .send svg,
+.say .mic svg {
+  width: 20px;
+  height: 20px;
+}
+.say.typed .send {
+  display: grid;
+}
+.say.typed .mic:not(.on) {
+  display: none;
+}
+.go.wide {
+  width: 100%;
+  height: 44px;
+  margin: 4px 0 12px;
+}
+
+/* The header: the mark, a way back to Your move while chatting, the switch, the gear. */
+.logo .name {
+  margin-inline-start: -2px;
+  color: var(--ink);
+  font-weight: 700;
+}
+.pill {
+  margin-inline-start: auto;
+  padding: 4px 10px;
+  border: 1px solid #ceff3266;
+  border-radius: 999px;
+  background: #ceff3214;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+.pill:hover {
+  background: #ceff3226;
+}
+.pill[hidden] + .icon {
+  margin-inline-start: auto;
+}
+.icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+}
+.icon svg {
+  width: 18px;
+  height: 18px;
+}
+.icon:hover,
+.icon[aria-pressed="true"] {
+  background: #ffffff12;
+  color: var(--ink);
+}
+.settings-view .row-lang {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+.settings-view .language-picker {
+  margin: 0;
+}
+.settings-view #disconnect {
+  margin-top: 14px;
+}
+.chat {
+  height: auto;
+  min-height: 120px;
+  max-height: 420px;
+}
+.chat,
+.asks li .words {
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff26 transparent;
+}
+
+.mic {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-soft);
+  flex: none;
+}
+.mic svg { width: 18px; height: 18px; }
+.mic:hover { color: var(--ink); }
+.mic.on {
+  border-color: var(--bad);
+  background: #e5322d;
+  color: #fff;
+  animation: rec 1.2s ease-in-out infinite;
+}
+@keyframes rec { 50% { box-shadow: 0 0 0 6px #e5322d33; } }
+@media (prefers-reduced-motion: reduce) {
+  .mic.on { animation: none; }
+}
+
+/* The chat is Chrome's side panel: as wide and as tall as they make it. */
+html,
+body {
+  height: 100%;
+}
+body {
+  width: auto;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+}
+#connected:not([hidden]) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.chat {
+  flex: 1;
+  max-height: none;
+}
+/* As in Telegram, a short conversation sits down by the box to write in. */
+.chat > :first-child {
+  margin-top: auto;
+}
+#settings:not([hidden]) {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.line,
+.out {
+  flex: none;
+}
+
+/* What waits on them: a plain list above the box to write in, each with its words and its own buttons. */
+.asks {
+  flex: none;
+  margin: 6px 0 0;
+  border: 1px solid #ceff3240;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.asks summary { padding: 8px 10px; cursor: pointer; color: var(--ink-soft); }
+.asks ol { list-style: none; margin: 0; padding: 0 10px 10px; display: grid; gap: 12px; max-height: 45vh; overflow: auto; }
+.asks li + li { border-top: 1px solid var(--line, #ffffff1f); padding-top: 10px; }
+.asks li .buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.asks li .buttons button { border: 1px solid var(--line, #ffffff1f); border-radius: 8px; background: none; color: inherit; padding: 5px 10px; cursor: pointer; font: inherit; }
+.asks li .buttons button:first-child { background: var(--accent); color: #0b0c0b; border-color: var(--accent); }
+.asks li .buttons button:disabled { opacity: 0.5; }
+
+/* "Going out soon": what Quest sends by itself next, each with a button that strikes it. */
+.out {
+  margin: 6px 0 0;
+  border: 1px solid var(--line, #ffffff1f);
+  border-radius: 10px;
+  font-size: 12.5px;
+}
+.out summary {
+  padding: 8px 10px;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+.out ol {
+  list-style: none;
+  margin: 0;
+  padding: 0 10px 8px;
+  display: grid;
+  gap: 6px;
+  max-height: 180px;
+  overflow: auto;
+}
+.out li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.out li span {
+  overflow-wrap: anywhere;
+  color: var(--ink-soft);
+}
+.out li b {
+  font-weight: 600;
+  color: var(--ink, inherit);
+}
+.out li button {
+  flex: none;
+  min-width: 28px;
+  min-height: 28px;
+  border: 1px solid var(--line, #ffffff1f);
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.out li button:hover,
+.out li button:focus-visible {
+  border-color: currentColor;
+}
+
+/* Where Quest works: each platform on or off, the model, the past reports. */
+.work h3 {
+  margin: 18px 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted, #888);
+}
+.platforms,
+.reports {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.platforms {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+}
+.platforms li + li {
+  border-top: 1px solid var(--border);
+}
+.platforms label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.platforms label span {
+  font-weight: 600;
+}
+.platforms label small {
+  flex: 1;
+  color: var(--muted, #888);
+  text-align: right;
+}
+.work .dim {
+  margin: 8px 2px 0;
+  font-size: 13px;
+  color: var(--muted, #888);
+}
+.reports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}

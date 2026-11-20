@@ -1,0 +1,35 @@
+{
+  "name": "@mq/agent",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/main.ts"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.15",
+    "@electric-sql/pglite-socket": "0.2.18",
+    "@hono/node-server": "^2.1.1",
+    "@langchain/core": "^1.2.12",
+    "@langchain/langgraph": "^1.4.18",
+    "@langchain/langgraph-checkpoint": "^1.1.5",
+    "@langchain/langgraph-checkpoint-postgres": "^1.0.5",
+    "@langchain/langgraph-sdk": "^1.9.23",
+    "@langchain/openai": "^1.5.13",
+    "@mq/core": "*",
+    "@mq/i18n": "*",
+    "deepagents": "^1.14.1",
+    "ffmpeg-static": "^5.3.0",
+    "hono": "^4.13.9",
+    "langchain": "^1.5.12",
+    "langsmith": ">=0.7.1 <0.10.0",
+    "pg": "^8.16.0",
+    "unpdf": "^1.8.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.3.317",
+    "@huggingface/transformers": "^4.3.2",
+    "@modelcontextprotocol/sdk": "^1.32.2"
+  }
+}

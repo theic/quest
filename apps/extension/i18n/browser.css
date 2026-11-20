@@ -1,0 +1,39 @@
+/* The language button: flag, code and caret, with the native select invisibly on top of it. */
+.language-picker {
+  position: relative; display: inline-flex; flex: none; align-items: center; height: 32px; margin-inline-start: 12px; padding: 0 10px;
+  border: 1px solid #8888; border-radius: 999px; color: inherit; cursor: pointer; vertical-align: middle;
+  transition: border-color .2s;
+}
+.language-picker:hover { border-color: currentColor; }
+.language-picker:has(select:focus-visible) { outline: 2px solid #60c090; outline-offset: 3px; }
+.language-face { display: inline-flex; align-items: center; gap: 7px; pointer-events: none; }
+.language-flag { width: 21px; height: 14px; border-radius: 3px; box-shadow: 0 0 0 1px #8886; }
+.language-code { font: 600 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: .04em; }
+.language-caret { width: 9px; height: 6px; opacity: .65; }
+/* 16px keeps iOS from zooming in when the list opens. */
+.language-picker select {
+  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: inherit;
+  font-size: 16px; color: #16161a; background: #fff; opacity: 0; cursor: pointer; -webkit-appearance: none; appearance: none;
+}
+.language-picker option { color: #16161a; background: #fff; }
+header > .language-picker { margin-inline-start: auto; }
+html[dir="rtl"] { text-align: right; }
+html[dir="rtl"] input[type="text"], input#code, input#server, .code { direction: ltr; unicode-bidi: isolate; }
+html[dir="rtl"] .logo, html[dir="rtl"] .tg-clock, html[dir="rtl"] time { direction: ltr; unicode-bidi: isolate; }
+html[lang="ar"] body, html[lang="hi"] body, html[lang="zh"] body { line-height: 1.65; }
+html[lang="ar"] h1, html[lang="hi"] h1, html[lang="zh"] h1 { line-height: 1.2; letter-spacing: 0; }
+html[dir="rtl"] .chapters button, html[dir="rtl"] button.more { text-align: start; }
+html[dir="rtl"] .tg-bubble, html[dir="rtl"] .app { text-align: start; }
+html[dir="rtl"] .app small { padding-inline-start: 0; }
+/* The Mini App's tab bar: the language button on a row of its own, at the end. */
+.top { gap: 16px; }
+#tabs { flex-wrap: wrap; }
+#tabs::after { content: ""; flex-basis: 100%; order: 1; }
+#tabs .language-picker { order: 2; margin: 0; margin-inline-start: auto; }
+#tabs button { min-width: 0; line-height: 1.4; }
+.top .chip { white-space: normal; overflow-wrap: anywhere; max-width: 55%; }
+@media (max-width: 700px) {
+  .language-picker { margin-inline-start: 0; }
+  header > .language-picker { margin-inline-start: auto; }
+  .top { flex-wrap: wrap; }
+}

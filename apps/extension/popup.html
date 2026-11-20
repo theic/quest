@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Messaging Quest</title>
+    <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="i18n/browser.css"><script type="module" src="i18n/browser.js"></script></head>
+  <body>
+    <div id="power-bar" class="power-bar" hidden=""><i aria-hidden="true"></i><span id="power-label" role="status">Quest is working in this Chrome</span><button id="power" type="button">Pause</button></div>
+    <header>
+      <span class="logo"><img src="icons/visor.svg" alt="" width="24" height="21"><span class="name">Quest</span></span>
+      <button id="gear" class="icon" type="button" aria-label="Settings" data-i18n-title="Settings" title="Settings" hidden=""><svg viewBox="0 0 20 20" aria-hidden="true"><path fill="currentColor" d="M11.2 1.5h-2.4l-.4 2.3a6.6 6.6 0 0 0-1.6.9L4.6 3.9 3.4 6l1.8 1.5a6.7 6.7 0 0 0 0 1.9L3.4 11l1.2 2.1 2.2-.8c.5.4 1 .7 1.6.9l.4 2.3h2.4l.4-2.3c.6-.2 1.1-.5 1.6-.9l2.2.8 1.2-2.1-1.8-1.6a6.7 6.7 0 0 0 0-1.9L16.6 6l-1.2-2.1-2.2.8a6.6 6.6 0 0 0-1.6-.9l-.4-2.3ZM10 7a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z" transform="translate(0 .5)"/></svg></button>
+    </header>
+
+    <section id="connected" hidden="">
+      <div id="chat" class="chat" aria-live="polite" hidden=""></div>
+      <details id="asks" class="asks" open="" hidden=""><summary id="asks-sum"></summary><ol id="asks-list"></ol></details>
+      <p id="line" class="line" hidden=""></p>
+      <details id="out" class="out" hidden=""><summary id="out-sum"></summary><ol id="out-list"></ol></details>
+      <form id="say" class="say">
+        <p id="reply-to" class="reply-to" hidden=""></p>
+        <textarea id="words" rows="1" placeholder="Write to Quest" data-i18n-placeholder="Write to Quest" maxlength="4000"></textarea>
+        <button type="button" id="mic" class="mic" aria-label="Voice message" data-i18n-title="Voice message" title="Voice message"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="7" y="2.5" width="6" height="10" rx="3" fill="currentColor"/><path d="M4.5 9.5a5.5 5.5 0 0 0 11 0M10 15v3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg></button>
+        <button type="submit" class="send" aria-label="Send" data-i18n-title="Send" title="Send"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4.5M5 9l5-5 5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </form>
+    </section>
+
+    <section id="settings" class="settings-view" hidden="">
+      <div class="row-lang"><span data-i18n="Language">Language</span><span data-language-picker=""></span></div>
+      <p id="state" class="badge"><i aria-hidden="true"></i><span><span data-i18n="Connected">Connected</span><span id="device"></span></span></p>
+      <p id="activity" class="activity"></p>
+      <div class="meter">
+        <p id="today"></p>
+        <span class="bar" aria-hidden="true"><i id="today-bar"></i></span>
+      </div>
+
+      <div class="settings">
+        <div class="setting">
+          <label for="awake" data-i18n="Keep this computer awake">Keep this computer awake</label>
+          <button class="info" type="button" aria-labelledby="awake-tip" aria-expanded="false"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="2.7" r="1.2" fill="currentColor"></circle><path d="M6 5.4v4.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg></button>
+          <input id="awake" class="toggle" type="checkbox" role="switch" aria-describedby="awake-tip">
+          <p class="tip" id="awake-tip" role="tooltip" data-i18n="So Quest keeps working while you're away. The screen still turns off, and closing a laptop's lid still puts it to sleep.">So Quest keeps working while you're away. The screen still turns off, and closing a laptop's lid still puts it to sleep.</p>
+        </div>
+        <div class="setting">
+          <label for="visual" data-i18n="Visual browser controls">Visual browser controls</label>
+          <button class="info" type="button" aria-labelledby="visual-tip" aria-expanded="false"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="2.7" r="1.2" fill="currentColor"></circle><path d="M6 5.4v4.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg></button>
+          <input id="visual" class="toggle" type="checkbox" role="switch" aria-describedby="visual-tip">
+          <p class="tip" id="visual-tip" role="tooltip" data-i18n="Let Quest use pictures and normal clicks/typing in its own work tab when a site hides its controls. Pictures go to its AI, never include your other tabs, and aren't kept in your chat or database. You handle sign-in.">Let Quest use pictures and normal clicks/typing in its own work tab when a site hides its controls. Pictures go to its AI, never include your other tabs, and aren't kept in your chat or database. You handle sign-in.</p>
+        </div>
+        <div class="setting">
+          <label for="front" data-i18n="Bring Quest's tab to the front">Bring Quest's tab to the front</label>
+          <button class="info" type="button" aria-labelledby="front-tip" aria-expanded="false"><svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="2.7" r="1.2" fill="currentColor"></circle><path d="M6 5.4v4.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg></button>
+          <input id="front" class="toggle" type="checkbox" role="switch" aria-describedby="front-tip">
+          <p class="tip" id="front-tip" role="tooltip" data-i18n="When a page shows its posts only on screen, or Quest clicks by sight, its tab comes to the front for a moment, then yours comes back. Off, Quest works only in the background, and some sites show it less.">When a page shows its posts only on screen, or Quest clicks by sight, its tab comes to the front for a moment, then yours comes back. Off, Quest works only in the background, and some sites show it less.</p>
+        </div>
+      </div>
+
+      <div id="work" class="work" hidden="">
+        <h3 data-i18n="Where Quest works">Where Quest works</h3>
+        <ul id="platforms" class="platforms"></ul>
+        <p id="model" class="dim"></p>
+        <h3 id="reports-head" data-i18n="Past reports" hidden="">Past reports</h3>
+        <ul id="reports" class="reports"></ul>
+      </div>
+
+      <details class="more">
+        <summary data-i18n="How it works">How it works</summary>
+        <p data-i18n="Quest reads pages in a tab group of its own, in this Chrome, where you're logged in. Once your product brief is settled, Quest can send on your behalf across your connected accounts. Say “ask me first” to review each draft. While Quest's tab is in front, this chat can show it as one picture that updates: its tab only, never your other tabs. /screen off stops it.">Quest reads pages in a tab group of its own, in this Chrome, where you're logged in. Once your product brief is settled, Quest can send on your behalf across your connected accounts. Say “ask me first” to review each draft. While Quest's tab is in front, this chat can show it as one picture that updates: its tab only, never your other tabs. /screen off stops it.</p>
+      </details>
+      <button id="telegram" type="button" class="text-link" data-i18n="Also talk to Quest in Telegram">Also talk to Quest in Telegram</button>
+      <p id="telegram-error" class="state bad" role="status" hidden="" data-i18n="Could not open Telegram. Try again.">Could not open Telegram. Try again.</p>
+      <button id="disconnect" type="button" class="quiet" data-i18n="Disconnect this Chrome">Disconnect this Chrome</button>
+    </section>
+
+    <section id="setup" hidden="">
+      <p class="lead" data-i18n="Hi, I'm Quest. I find the people who want what you built, and hand you the words to reach them.">Hi, I'm Quest. I find the people who want what you built, and hand you the words to reach them.</p>
+      <button id="hello" type="button" class="go wide" data-i18n="Start talking">Start talking</button>
+      <p id="error" class="state bad" hidden=""></p>
+      <p id="note" class="state" hidden=""></p>
+      <details class="more">
+        <summary data-i18n="I have a code from Telegram">I have a code from Telegram</summary>
+        <form id="pair">
+          <input id="code" autocomplete="off" spellcheck="false" placeholder="K7P2-9QXM" maxlength="12" required="">
+          <button type="submit" class="go" data-i18n="Connect">Connect</button>
+        </form>
+      </details>
+      <details id="address" class="more" hidden="">
+        <summary data-i18n="Quest's address">Quest's address</summary>
+        <input id="server" autocomplete="off" spellcheck="false">
+      </details>
+    </section>
+
+    <script type="module" src="src/popup.js"></script>
+
+
+</body></html>

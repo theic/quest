@@ -1,0 +1,19 @@
+{
+  "version": 3,
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/privacy/?", "dest": "/privacy.html" },
+    { "src": "/terms/?", "dest": "/terms.html" },
+    { "src": "/m/[A-Za-z0-9]*/?", "dest": "/m.html" },
+    { "src": "/cookies/?", "status": 308, "headers": { "Location": "/privacy#this-website" } },
+    { "src": "/acceptable-use/?", "status": 308, "headers": { "Location": "/terms#acceptable-use" } },
+    { "src": "/refunds/?", "status": 308, "headers": { "Location": "/terms#paid-plans" } },
+    { "src": "/api/broadcast/unsubscribe", "dest": "https://mq-v2-agent.fly.dev/api/broadcast/unsubscribe" },
+    { "src": "/ingest/static/(.*)", "dest": "https://eu-assets.i.posthog.com/static/$1" },
+    { "src": "/ingest/array/(.*)", "dest": "https://eu-assets.i.posthog.com/array/$1" },
+    { "src": "/ingest/(.*)", "dest": "https://eu.i.posthog.com/$1" },
+    { "src": "/fonts/(.*)", "headers": { "Cache-Control": "public, max-age=31536000, immutable" }, "continue": true },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "status": 404, "dest": "/moved.html" }
+  ]
+}

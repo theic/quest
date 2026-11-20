@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="export.css">
+<style>
+  html, body { margin: 0; overflow: hidden; background: transparent; }
+  body.photo { background: #0f100d; }
+  #m, #m svg { display: block; width: 100vw; height: 100vh; }
+</style>
+<div id="m"></div>
+<script src="mq.js"></script>
+<script>
+  const q = new URLSearchParams(location.search);
+  const mode = q.get("mode"), state = q.get("state");
+  // Sticker layout: the whole avatar composition, zoomed about (ax, ay); fx moved inside the canvas.
+  const STICKER = { zoom: +(q.get("zoom") || 1.06), at: [256, +(q.get("ay") || 236)], cut: +(q.get("cut") || 11) };
+  const FX = { z: [196, 196], q: [86, 104], sparks: [[118, 150, 30], [176, 92, 17], [436, 196, 15]] };
+  document.body.className = mode;
+  document.getElementById("m").innerHTML = mode === "sticker"
+    ? MQ.svg("bot", { state, cls: "stk", sticker: STICKER, fxAt: FX })
+    : MQ.svg("bot", { state, cls: "pho", glow: true });
+  window.seek = (ms) => {
+    for (const a of document.getAnimations()) { a.pause(); a.currentTime = ms; }
+    return new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  };
+  window.__ready = true;
+</script>

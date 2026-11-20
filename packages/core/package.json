@@ -1,0 +1,9 @@
+{
+  "name": "@mq/core",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

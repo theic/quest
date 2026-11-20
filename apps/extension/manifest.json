@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "Messaging Quest",
+  "short_name": "Quest",
+  "version": "0.16.0",
+  "description": "__MSG_description__",
+  "homepage_url": "https://www.messaging.quest/",
+  "default_locale": "en",
+  "minimum_chrome_version": "121",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Show or hide Quest",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "storage",
+    "alarms",
+    "power",
+    "tabs",
+    "tabGroups",
+    "scripting",
+    "webRequest",
+    "declarativeNetRequestWithHostAccess",
+    "debugger",
+    "contextMenus",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mq-v2-agent.fly.dev/connect*",
+        "http://localhost/connect*",
+        "http://127.0.0.1/connect*"
+      ],
+      "js": [
+        "src/connect.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.messaging.quest/*",
+        "https://messaging.quest/*",
+        "http://localhost/*"
+      ],
+      "js": [
+        "src/landing.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "popup.html"
+  }
+}

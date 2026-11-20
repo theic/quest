@@ -1,0 +1,51 @@
+# The manager and its team. Deploy from the repo root:
+#   flyctl deploy . --config apps/agent/fly.toml --dockerfile apps/agent/Dockerfile --remote-only
+# Secrets (never in this file): scripts/fly-secrets.ts agent
+app = "mq-v2-agent"
+primary_region = "fra"
+# SIGINT lets running tasks go back to the queue before the machine stops.
+kill_signal = "SIGINT"
+kill_timeout = "30s"
+
+[env]
+  # Production: the agent refuses to start on dev's database, bot or address (apps/agent/src/environments.ts).
+  MQ_ENV = "production"
+  PORT = "8080"
+  HEARTBEAT_MINUTES = "60"
+  # Where the database's wake job reaches the agent (supabase/migrations/*_agent_sleep.sql).
+  PUBLIC_URL = "https://mq-v2-agent.fly.dev"
+  SLEEP_AFTER_MINUTES = "2"
+  # Videos they upload from their page (media/uploads.ts) are kept here, on the volume below, for a week.
+
+[mounts]
+  source = "mq_uploads"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # The agent suspends itself when idle (lifecycle/idle-sleeper.ts): Fly's proxy
+  # sees only HTTP, so its own autostop would suspend a machine mid-task. The
+  # proxy still resumes the machine on the next request: a Telegram update, or
+  # the database's wake job when queued work falls due.
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 50
+    hard_limit = 100
+
+[[http_service.checks]]
+  grace_period = "30s"
+  interval = "30s"
+  method = "GET"
+  path = "/health"
+  timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  # ffmpeg holds 250 MB on a 1080p video and 440 to 600 MB on a 4K one beside the agent's own 250 MB (FACTS.md, "Videos the
+  # founder gives Quest"); a render starts only when 600 MB is free. 2 GB is still within what Fly can suspend.
+  memory = "2gb"

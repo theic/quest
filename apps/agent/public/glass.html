@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quest</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</body></html>
+<style>
+:root {
+  --bg: var(--tg-theme-secondary-bg-color, #f1f1f4);
+  --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #ffffff));
+  --fg: var(--tg-theme-text-color, #16161a);
+  --hint: var(--tg-theme-hint-color, #8a8a90);
+  --head: var(--tg-theme-section-header-text-color, var(--hint));
+  --link: var(--tg-theme-link-color, #2f6fed);
+  --accent: var(--tg-theme-button-color, #2f6fed);
+  --accent-fg: var(--tg-theme-button-text-color, #ffffff);
+  --sep: var(--tg-theme-section-separator-color, rgba(128, 128, 140, 0.18));
+  --ok: #2e9a5b; --warn: #c27c0e; --bad: #d14343;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tg]) { --bg: #0f0f11; --card: #1b1b1f; --fg: #ececf0; --hint: #8e8e96; --link: #7aa5ff; --accent: #4f7fe0; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); }
+body { font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+nav { position: sticky; top: 0; z-index: 2; display: flex; gap: 4px; padding: 10px 12px; background: var(--bg); overflow-x: auto; scrollbar-width: none; }
+nav::-webkit-scrollbar { display: none; }
+nav button, nav a { flex: 1 1 0; min-width: 0; box-sizing: border-box; text-align: center; border: 0; border-radius: 9px; padding: 8px 8px; font: inherit; font-size: 14px; font-weight: 600; line-height: 1; white-space: nowrap; color: var(--hint); background: transparent; cursor: pointer; }
+nav a { color: var(--link); text-decoration: none; }
+nav button.on { background: var(--card); color: var(--fg); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08); }
+main { padding: 0 12px 28px; max-width: 640px; margin: 0 auto; }
+h2 { margin: 18px 4px 6px; font-size: 12px; font-weight: 600; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.04em; color: var(--head); }
+.card { background: var(--card); border-radius: 12px; overflow: hidden; }
+.row { display: block; padding: 10px 14px; color: inherit; text-decoration: none; }
+.row + .row { border-top: 1px solid var(--sep); }
+.top { display: flex; align-items: baseline; gap: 8px; }
+.t { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.m { margin-top: 2px; font-size: 13px; color: var(--hint); overflow-wrap: anywhere; }
+a.row .t { color: var(--fg); }
+a.row .m.url { color: var(--link); }
+.chip { flex: none; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 99px; background: var(--sep); color: var(--hint); }
+.chip.ok { background: rgba(46, 154, 91, 0.14); color: var(--ok); }
+.chip.warn { background: rgba(194, 124, 14, 0.14); color: var(--warn); }
+.chip.bad { background: rgba(209, 67, 67, 0.14); color: var(--bad); }
+.chip.on { background: var(--accent); color: var(--accent-fg); }
+.text { padding: 12px 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.empty { color: var(--hint); }
+.dots { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--sep); }
+.dots i.on { background: var(--accent); }
+.who { flex: none; width: 64px; font-size: 12px; font-weight: 600; color: var(--hint); padding-top: 1px; }
+.time { flex: none; font-size: 12px; color: var(--hint); font-variant-numeric: tabular-nums; padding-top: 1px; }
+.notice { margin: 40px 16px; text-align: center; color: var(--hint); }
+/* The off switch, at the top of every tab: Quest on or off, as /on and /off in the chat. */
+.power { display: flex; align-items: center; gap: 10px; margin: 2px 0 4px; padding: 10px 14px; border-radius: 12px; background: var(--card); }
+.power .t { font-weight: 600; }
+.power .m { margin: 0; }
+.power.off { box-shadow: inset 0 0 0 1.5px var(--warn); }
+.switch { flex: none; position: relative; width: 46px; height: 28px; border: 0; border-radius: 99px; padding: 0; background: var(--sep); cursor: pointer; transition: background .2s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform .2s; }
+.switch[aria-checked="true"] { background: var(--ok); }
+.switch[aria-checked="true"]::after { transform: translateX(18px); }
+header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 4px; max-width: 640px; margin: 0 auto; }
+header b { font-size: 17px; }
+header a { color: var(--link); text-decoration: none; font-size: 14px; }
+</style>
+<link rel="stylesheet" href="/i18n/browser.css"><script type="module" src="/i18n/browser.js"></script></head>
+<body>
+<header><b>Quest</b><a id="help" href="https://t.me/theicreator" target="_blank" rel="noopener" data-i18n="Help">Help</a></header>
+<main><div id="power"></div><div id="view"><p class="notice" data-i18n="Loading…">Loading…</p></div></main>
+<script type="module">
+import { ready, t, currentLocale, systemMessage } from "/i18n/browser.js";
+// The language is the customer's everywhere: the picker tells the agent, so the chat speaks it too.
+window.questLanguageChanged = function (choice) {
+  var w = window.Telegram && window.Telegram.WebApp;
+  if (!w || !w.initData) return null;
+  return fetch("/glass/language", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ initData: w.initData, locale: choice }) });
+};
+await ready;
+(function () {
+  var tg = window.Telegram && window.Telegram.WebApp;
+  document.getElementById("help").addEventListener("click", function (ev) { if (tg && tg.openTelegramLink) { ev.preventDefault(); tg.openTelegramLink(this.href); } });
+  if (tg && tg.initData) { document.documentElement.setAttribute("data-tg", ""); tg.ready(); tg.expand(); }
+  var view = document.getElementById("view");
+  var data = null;
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined && text !== null) e.textContent = text;
+    return e;
+  }
+  var rtf = new Intl.RelativeTimeFormat(currentLocale(), { numeric: "auto", style: "short" });
+  function when(iso) {
+    if (!iso) return "";
+    var s = (new Date(iso).getTime() - Date.now()) / 1000, a = Math.abs(s);
+    if (a < 60) return t(s < 0 ? "just now" : "in a minute");
+    if (a < 3600) return rtf.format(Math.round(s / 60), "minute");
+    if (a < 86400) return rtf.format(Math.round(s / 3600), "hour");
+    return rtf.format(Math.round(s / 86400), "day");
+  }
+  function clock(iso) { return new Date(iso).toLocaleTimeString(currentLocale(), { hour: "2-digit", minute: "2-digit" }); }
+  function open(href) { return function (ev) { if (tg && tg.openLink) { ev.preventDefault(); tg.openLink(href); } }; }
+  // Addresses on this page come from what the team read on the web: only a web address becomes a link (never javascript:).
+  function webUrl(u) { try { var p = new URL(String(u)); return p.protocol === "https:" || p.protocol === "http:" ? p.href : null; } catch (e) { return null; } }
+  function row(text, meta, chip, href, clamp) {
+    href = href ? webUrl(href) : null;
+    var r = el(href ? "a" : "div", "row");
+    if (href) { r.href = href; r.target = "_blank"; r.rel = "noopener"; r.addEventListener("click", open(href)); }
+    var top = el("div", "top");
+    top.appendChild(el("div", clamp ? "t clamp" : "t", text));
+    if (chip) top.appendChild(el("span", "chip " + (chip[1] || ""), systemMessage(chip[0])));
+    r.appendChild(top);
+    if (meta) r.appendChild(el("div", "m", meta));
+    return r;
+  }
+  function section(title, rows, empty, limit) {
+    var frag = document.createDocumentFragment();
+    frag.appendChild(el("h2", null, t(title)));
+    var card = el("div", "card");
+    if (!rows.length) card.appendChild(el("div", "row empty", t(empty || "Nothing")));
+    var shown = limit && rows.length > limit + 1 ? rows.slice(0, limit) : rows;
+    shown.forEach(function (r) { card.appendChild(r); });
+    if (shown.length < rows.length) {
+      var more = el("button", "row more", t("Show {count} more", { count: rows.length - shown.length }));
+      more.addEventListener("click", function () { more.remove(); rows.slice(shown.length).forEach(function (r) { card.appendChild(r); }); });
+      card.appendChild(more);
+    }
+    frag.appendChild(card);
+    return frag;
+  }
+  function list(xs) { return xs || []; }
+  var TASK = { running: ["running", "on"], queued: ["queued", ""], waiting: ["waiting", "warn"], succeeded: ["done", "ok"], failed: ["failed", "bad"], cancelled: ["cancelled", ""] };
+
+  var LIMIT = [["posts", "Posts {used} of {max}"], ["messages", "Messages {used} of {max}"], ["actions", "Likes and follows {used} of {max}"], ["profile", "Profile {used} of {max}"]];
+  function money(usd) {
+    try { return new Intl.NumberFormat(currentLocale() === "ar" ? "en" : currentLocale(), { style: "currency", currency: "USD", currencyDisplay: "narrowSymbol" }).format(usd); }
+    catch (e) { return "$" + Number(usd).toFixed(2); }
+  }
+  var ACCESS = { invite: "On an invite", credits: "Pay as you go" };
+  function plan(b) {
+    var rows = [];
+    var rest = !b.resting ? null : (b.restingFor === "credits" ? t("Out of credits: top up to go on") : t("resting until your midnight, back {time}", { time: when(b.resting) }));
+    if (b.balance !== null && b.balance !== undefined) rows.push(row(t("Credits left"), rest ? money(b.balance) + " · " + rest : money(b.balance), b.link ? ["Top up", "on"] : null, b.link));
+    else rows.push(row(t(ACCESS[b.access] || "Pay as you go"), rest, b.resting ? ["resting", "warn"] : b.access === "credits" ? null : ["free", ""]));
+    return section("Credits", rows);
+  }
+
+  // Settings and status: their Chrome and what runs now, credits, what goes up by itself where, and the day limits.
+  function settings(d) {
+    var f = document.createDocumentFragment();
+    var c = d.chrome || {};
+    var cstate = c.state === "open" ? ["open", "ok"] : c.state === "silent" ? ["silent", "warn"] : ["not connected", "bad"];
+    var running = list(d.tasks).filter(function (x) { return x.status === "running" || x.status === "waiting"; });
+    var nowRows = [row(c.device || t("Your Chrome"), c.seen ? t("heard from {time}", { time: when(c.seen) }) : null, cstate)];
+    running.slice(0, 3).forEach(function (x) { nowRows.push(row(x.title, systemMessage(x.agent) + " · " + when(x.at), TASK[x.status], null, true)); });
+    list(d.questions).forEach(function (q) { nowRows.push(row(q.text, t(q.agent) + " · " + when(q.at), ["waiting for you", "warn"], null, true)); });
+    f.appendChild(section("Now", nowRows));
+    if (d.billing) f.appendChild(plan(d.billing));
+    f.appendChild(section("Your Chrome", [frontRow(d)]));
+    f.appendChild(section("Posting", list(d.posting).map(function (p) {
+      return row(t(p.platform), p.alone ? t("Posts automatically · approved: {count}", { count: p.approved }) : t("Approved: {count}/{total}. Then Quest offers to post by itself.", { count: p.approved, total: p.of }), p.alone ? ["by itself", "ok"] : ["asks first", "warn"]);
+    })));
+    var limits = list(d.limits).map(function (p) {
+      var full = false;
+      var parts = LIMIT.filter(function (k) { return p.limits[k[0]] > 0; }).map(function (k) {
+        if (p.used[k[0]] >= p.limits[k[0]]) full = true;
+        return t(k[1], { used: p.used[k[0]], max: p.limits[k[0]] });
+      });
+      return row(t(p.name), parts.join(" · "), full ? ["limit reached", "warn"] : null);
+    });
+    limits.unshift(row(t("Replies and comments have no limit."), t("Counted over the last 24 hours. New posts, messages, likes and follows, profile changes.")));
+    f.appendChild(section("Day limits", limits));
+    return f;
+  }
+
+  function frontRow(d) {
+    var on = !(d.chrome && d.chrome.front === false);
+    var r = row(t("Bring Quest's tab to the front"), t("When a page shows its posts only on screen, or Quest clicks by sight, its tab comes to the front for a moment, then yours comes back. Off, Quest works only in the background, and some sites show it less."));
+    var sw = el("button", "switch");
+    sw.setAttribute("role", "switch");
+    sw.setAttribute("aria-checked", on ? "true" : "false");
+    sw.setAttribute("aria-label", t("Bring Quest's tab to the front"));
+    sw.addEventListener("click", function () {
+      sw.disabled = true;
+      fetch("/glass/front", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ initData: tg ? tg.initData : "", on: !on }) })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (j) { if (j) { d.chrome = Object.assign({}, d.chrome, { front: j.chromeFront }); if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light"); } render(); })
+        .catch(function () { sw.disabled = false; });
+    });
+    r.querySelector(".top").appendChild(sw);
+    return r;
+  }
+
+
+  // The off switch: on, Quest works; off, nothing runs in their Chrome and nothing is posted until it is on.
+  var powerBox = document.getElementById("power");
+  function drawPower() {
+    powerBox.textContent = "";
+    if (!data) return;
+    var on = !data.off;
+    var box = el("div", on ? "power" : "power off");
+    var words = el("div", "t");
+    words.appendChild(el("div", null, t(on ? "Quest is on" : "Quest is off")));
+    words.appendChild(el("div", "m", t(on ? "Switch it off to have your Chrome to yourself." : "Nothing runs in your Chrome and nothing is posted until you switch it on.")));
+    var sw = el("button", "switch");
+    sw.setAttribute("role", "switch");
+    sw.setAttribute("aria-checked", on ? "true" : "false");
+    sw.setAttribute("aria-label", t(on ? "Switch Quest off" : "Switch Quest on"));
+    sw.addEventListener("click", function () {
+      sw.disabled = true;
+      fetch("/glass/power", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ initData: tg ? tg.initData : "", on: !on }) })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { if (j) { data.off = j.off; if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light"); } drawPower(); })
+        .catch(function () { drawPower(); });
+    });
+    box.appendChild(words);
+    box.appendChild(sw);
+    powerBox.appendChild(box);
+  }
+
+  function render() {
+    drawPower();
+    if (!data) return;
+    var y = window.scrollY;
+    view.textContent = "";
+    view.appendChild(settings(data));
+    window.scrollTo(0, y);
+  }
+
+  function load() {
+    var initData = tg ? tg.initData : "";
+    if (!initData) { view.textContent = ""; view.appendChild(el("p", "notice", t("Open this from Quest's chat in Telegram: the Quest button by the message box."))); return; }
+    fetch("/glass/data", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ initData: initData }) })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) { view.textContent = ""; view.appendChild(el("p", "notice", t(res.j.error || "Could not load."))); return; }
+        data = res.j;
+        // Their chat's language shows here too: once, so a catalog that will not load cannot loop.
+        if (data.locale && data.locale !== currentLocale()) {
+          try {
+            if (!sessionStorage.getItem("quest-language-synced")) {
+              sessionStorage.setItem("quest-language-synced", "1");
+              localStorage.setItem("quest-language", data.locale);
+              location.replace(location.pathname + "?lang=" + data.locale);
+              return;
+            }
+          } catch (e) { /* Storage is optional. */ }
+        }
+        render();
+      })
+      .catch(function () { if (!data) { view.textContent = ""; view.appendChild(el("p", "notice", t("Could not load. Close and open it again."))); } });
+  }
+  render();
+  load();
+  // Read again when they come back to it, and every 5 minutes while it stays open (a page left open read every
+  // 30 s was 180 MB out of the database in two and a half days).
+  var loadedAt = Date.now();
+  function fresh(ms) { if (document.visibilityState === "visible" && Date.now() - loadedAt > ms) { loadedAt = Date.now(); load(); } }
+  document.addEventListener("visibilitychange", function () { fresh(30000); });
+  setInterval(function () { fresh(300000); }, 30000);
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,6 @@
+# messaging.quest welcomes every crawler: search engines, link previews and AI assistants alike.
+# A plain-text summary for AI assistants is at https://www.messaging.quest/llms.txt
+User-agent: *
+Allow: /
+
+Sitemap: https://www.messaging.quest/sitemap.xml

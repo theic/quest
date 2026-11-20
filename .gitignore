@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.next/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+coverage/
+.artifacts/
+.turbo/
+supabase/.temp/
+
+# The dev stack's own: the dev extension Chrome loads, cloudflared (scripts/dev-agent.ts)
+.dev/

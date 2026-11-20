@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Store images</title>
+<!--
+  The Chrome Web Store images, one per ?scene= (render.cjs photographs each at the store's pixels),
+  and the extension's icons, one per ?icon=<size>. The look is the landing's: near-black, warm white,
+  one lime accent, DM Sans with JetBrains Mono for labels. The pictures placed here are real: the
+  popup as the extension draws it, and the landing's Telegram demo, a sample conversation.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&amp;family=JetBrains+Mono:wght@500;600&amp;display=block">
+<link rel="stylesheet" href="/brand/visor/render/base.css">
+<style>
+  :root {
+    --bg: #0b0c0b; --surface: #161715; --ink: #e8e8dc; --ink-soft: #c2c3b9; --muted: #a4a59b;
+    --border: #ffffff1c; --border-strong: #ffffff33; --accent: #ceff32; --on-accent: #161811;
+    --sans: "DM Sans", Arial, sans-serif; --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: transparent; }
+  body { color: var(--ink); font-family: var(--sans); font-optical-sizing: auto; -webkit-font-smoothing: antialiased; }
+  template { display: none; }
+  #icon { display: block; }
+  #icon svg { display: block; }
+
+  /* A screenshot: the copy on the left, the product on the right. */
+  .shot {
+    position: relative; width: 1280px; height: 800px; overflow: hidden;
+    display: grid; grid-template-columns: 560px 1fr; align-items: center;
+    background: radial-gradient(760px 560px at 82% 42%, #ceff3216, transparent 70%), radial-gradient(600px 400px at 0% 100%, #ceff320a, transparent 70%), var(--bg);
+  }
+  .copy { padding: 0 0 40px 84px; }
+  .eyebrow { margin: 0 0 18px; font: 500 12px/1.6 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  h1 { margin: 0 0 22px; font-size: 52px; line-height: 1.04; letter-spacing: -.035em; font-weight: 700; text-wrap: balance; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .copy p { margin: 0; max-width: 420px; font-size: 19px; line-height: 1.55; color: var(--ink-soft); text-wrap: pretty; }
+  .copy p + p { margin-top: 14px; }
+  .ticks { margin: 26px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; font-size: 16px; color: var(--ink-soft); }
+  .ticks li { display: flex; gap: 10px; align-items: baseline; }
+  .ticks li::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transform: translateY(-2px); }
+  .brand { position: absolute; left: 84px; bottom: 44px; display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 700; letter-spacing: -.03em; }
+  .brand span { color: var(--accent); }
+  .brand svg { width: 28px; height: 28px; }
+  .stage { position: relative; height: 100%; }
+  .stage > * { position: absolute; }
+  .phone { filter: drop-shadow(0 30px 60px #000a); }
+  .lift { filter: drop-shadow(0 24px 48px #000c); border-radius: 12px; }
+
+  /* The bridge from the landing: you chat in Telegram, it works in your Chrome. */
+  .bridge { display: inline-flex; align-items: center; gap: 14px; margin-top: 30px; padding: 12px 18px; border: 1px solid var(--border-strong); border-radius: 999px; background: #161715cc; }
+  .bridge b { display: block; font-size: 14px; }
+  .bridge small { display: block; font-size: 12px; color: var(--muted); }
+  .bridge i { width: 46px; height: 2px; background: linear-gradient(90deg, #2aabee, var(--accent)); border-radius: 2px; }
+  .dot { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; }
+  .dot svg { width: 20px; height: 20px; }
+  .dot.tg { background: #2aabee; color: #fff; }
+  .dot.cr { background: #fff; }
+
+  /* A Chrome window, drawn plainly: Quest's own window with its tab group. */
+  .window { width: 620px; height: 470px; border-radius: 12px; overflow: hidden; background: #fff; color: #1f1f1f; box-shadow: 0 0 0 1px #ffffff26; }
+  .tabs { display: flex; align-items: flex-end; gap: 6px; height: 42px; padding: 0 12px; background: #dfe3ea; }
+  .lights { display: flex; gap: 7px; margin: 0 10px 14px 2px; }
+  .lights i { width: 11px; height: 11px; border-radius: 50%; background: #b9bec7; }
+  .group { margin-bottom: 9px; padding: 3px 9px; border-radius: 6px; background: #1a73e8; color: #fff; font: 600 12px/1.4 system-ui, "Segoe UI", sans-serif; }
+  .tab { display: flex; align-items: center; gap: 8px; width: 230px; height: 34px; padding: 0 12px; border-radius: 9px 9px 0 0; background: #fff; font: 13px system-ui, "Segoe UI", sans-serif; box-shadow: inset 0 3px 0 #1a73e8; }
+  .tab i { width: 14px; height: 14px; border-radius: 3px; background: #ff4500; }
+  .bar { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border-bottom: 1px solid #e3e3e3; }
+  .omni { flex: 1; height: 30px; padding: 0 14px; border-radius: 15px; background: #eef1f6; font: 13px/30px system-ui, "Segoe UI", sans-serif; color: #444; white-space: nowrap; overflow: hidden; }
+  .ext { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #d3e3fd; }
+  .thread { width: 380px; padding: 22px 28px; font: 15px/1.5 system-ui, "Segoe UI", sans-serif; }
+  .thread .meta { color: #6a6a6a; font-size: 12.5px; }
+  .thread h2 { margin: 6px 0 10px; font-size: 21px; line-height: 1.3; letter-spacing: -.01em; }
+  .thread p { margin: 0 0 14px; color: #2b2b2b; }
+  .thread .reply { margin-top: 16px; padding: 12px 14px; border-left: 3px solid #e3e3e3; }
+  .thread .lines i { display: block; height: 9px; margin: 9px 0; border-radius: 5px; background: #ececec; }
+
+  /* A Telegram message with its link buttons, the way the bot sends the connect link. */
+  .bubble { width: 380px; padding: 14px 16px 12px; border-radius: 16px 16px 16px 4px; background: #212d3b; color: #f5f5f5; font: 15px/1.45 system-ui, "Segoe UI", sans-serif; }
+  .bubble .who { margin: 0 0 6px; color: #6ab3f3; font-weight: 600; font-size: 14px; }
+  .bubble p { margin: 0 0 8px; }
+  .bubble code { padding: 1px 6px; border-radius: 5px; background: #ffffff1a; font: 600 14px ui-monospace, Consolas, monospace; letter-spacing: 1px; }
+  .tg-links { display: grid; gap: 6px; width: 380px; margin-top: 6px; }
+  .tg-links span { display: block; padding: 10px; border-radius: 10px; background: #2b3a4c; color: #fff; text-align: center; font: 600 14px system-ui, "Segoe UI", sans-serif; }
+  .tg-links span.on { box-shadow: 0 0 0 2px var(--accent); }
+  .page-card { width: 430px; padding: 22px 24px; border-radius: 14px; background: #1d1d1c; border: 1px solid #2e2d2a; font: 15px/1.5 system-ui, "Segoe UI", sans-serif; color: #eeeae3; }
+  .page-card h3 { margin: 0 0 8px; font-size: 19px; }
+  .page-card .ok { margin: 14px 0 4px; color: #5cc08a; font-weight: 600; }
+  .page-card .muted { margin: 0; color: #a39e95; font-size: 14px; }
+  .arrow { margin: 0; color: var(--accent); font: 600 13px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+
+  /* The promo tiles: the mark, the name, and as few words as will do. */
+  .tile-small, .marquee { position: relative; overflow: hidden; background: radial-gradient(420px 260px at 26% 48%, #ceff3226, transparent 70%), var(--bg); }
+  .tile-small { width: 440px; height: 280px; display: flex; align-items: center; gap: 26px; padding: 0 34px; }
+  .tile-small .mq { width: 150px; flex: none; }
+  .wordmark { font-weight: 700; letter-spacing: -.04em; line-height: 1; }
+  .wordmark span { color: var(--accent); }
+  .tile-small .wordmark { font-size: 38px; }
+  .tile-small .wordmark span { display: block; }
+  .tile-small p { margin: 14px 0 0; font-size: 17px; line-height: 1.35; color: var(--ink-soft); }
+  .marquee { width: 1400px; height: 560px; display: grid; grid-template-columns: 300px 1fr 420px; align-items: center; gap: 40px; padding: 0 0 0 90px; background: radial-gradient(520px 360px at 15% 50%, #ceff3224, transparent 70%), radial-gradient(600px 500px at 88% 40%, #ceff3214, transparent 70%), var(--bg); }
+  .marquee .mq { width: 300px; }
+  .marquee .wordmark { font-size: 30px; margin-bottom: 22px; }
+  .marquee h1 { font-size: 58px; margin: 0; }
+  .marquee .crop { position: relative; height: 560px; overflow: hidden; }
+  .marquee .crop img { position: absolute; top: 40px; left: 40px; width: 340px; }
+</style>
+</head>
+<body>
+
+<template id="hire">
+  <section class="shot">
+    <div class="copy">
+      <p class="eyebrow">A personal assistant you hire in Telegram</p>
+      <h1>Finds people and talks to them, <em>so you don't have to.</em></h1>
+      <p>Tell Quest in Telegram who you need: customers, clients or hires. It does the work in your own Chrome and brings you the people, each with a message ready.</p>
+      <div class="bridge">
+        <span class="dot tg"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M21.7 3.3 18.4 20c-.2 1.2-.9 1.5-1.9.9l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.4-5.1 9.3-8.4c.4-.4-.1-.6-.6-.3L5.7 13.4.8 11.9c-1.1-.3-1.1-1.1.2-1.6L20.2 2.9c.9-.3 1.7.2 1.5.4Z"/></svg></span>
+        <span><b>Telegram</b><small>You chat with it here</small></span>
+        <i></i>
+        <span class="dot cr"><svg viewBox="0 0 24 24"><path fill="#ea4335" d="M12 12 3.34 7A10 10 0 0 1 20.66 7Z"/><path fill="#fbbc04" d="M12 12 20.66 7A10 10 0 0 1 12 22Z"/><path fill="#34a853" d="M12 12 12 22A10 10 0 0 1 3.34 7Z"/><circle cx="12" cy="12" r="5" fill="#fff"/><circle cx="12" cy="12" r="3.9" fill="#4285f4"/></svg></span>
+        <span><b>Your Chrome</b><small>It works here, signed in as you</small></span>
+      </div>
+    </div>
+    <div class="stage"><img class="phone" src="/parts/phone-3.png" style="width:350px; left:180px; top:46px"></div>
+    <div class="brand" data-brand></div>
+  </section>
+</template>
+
+<template id="chrome">
+  <section class="shot">
+    <div class="copy">
+      <p class="eyebrow">The extension</p>
+      <h1>It works in your Chrome, <em>signed in as you.</em></h1>
+      <p>Quest opens pages in a window of its own, at a reader's pace. Sites show it what they show you, and it never asks for a password.</p>
+      <ul class="ticks">
+        <li>Up to 400 pages a day, a few seconds apart</li>
+        <li>Your other tabs and windows stay yours</li>
+        <li>Disconnect any time from the toolbar</li>
+      </ul>
+    </div>
+    <div class="stage">
+      <div class="window lift" style="left:0; top:96px; width:700px; height:600px">
+        <div class="tabs"><span class="lights"><i></i><i></i><i></i></span><span class="group">Quest is reading</span><span class="tab"><i></i>Client is 60 days late on a…</span></div>
+        <div class="bar"><span class="omni">reddit.com/r/freelance/comments/1c9x/client_is_60_days_late</span><span class="ext" data-icon="32"></span></div>
+        <div class="thread">
+          <div class="meta">r/freelance · u/maya_draws · 2 hr. ago</div>
+          <h2>Client is 60 days late on a $2,400 invoice. What actually works?</h2>
+          <p>Sent three reminders and heard nothing. Is there something that chases them for me, so I can stop writing awkward emails?</p>
+          <div class="reply"><div class="meta">u/jon_builds · 1 hr. ago</div><div class="lines"><i style="width:92%"></i><i style="width:74%"></i></div></div>
+          <div class="reply"><div class="meta">u/ana_ux · 40 min. ago</div><div class="lines"><i style="width:85%"></i></div></div>
+        </div>
+      </div>
+      <img class="lift" src="/parts/popup-reading.png" style="width:320px; left:366px; top:186px">
+    </div>
+    <div class="brand" data-brand></div>
+  </section>
+</template>
+
+<template id="connect">
+  <section class="shot">
+    <div class="copy">
+      <p class="eyebrow">Setup</p>
+      <h1>Connect it <em>with one link.</em></h1>
+      <p>Quest sends a Connect Chrome link in Telegram. Open it on your computer and this Chrome is paired. No account to make, no password.</p>
+      <p>Or click the toolbar icon and type the code from the same message.</p>
+    </div>
+    <div class="stage">
+      <div style="left:0; top:96px">
+        <p class="arrow">1 · In Telegram</p>
+        <div class="bubble" style="margin-top:12px"><p class="who">Quest</p><p>1. Install the Messaging Quest extension for Chrome.</p><p>2. Open “Connect Chrome” in Chrome. It connects by itself.</p><p style="margin:0">If that page doesn't open in Chrome, click the extension's icon and enter the code <code>K7P2-9QXM</code>.</p></div>
+        <div class="tg-links"><span>1. Install the extension</span><span class="on">2. Connect Chrome</span></div>
+      </div>
+      <div style="left:0; top:518px">
+        <p class="arrow">2 · Opens in Chrome</p>
+        <div class="page-card lift" style="margin-top:12px; width:380px">
+          <h3>Connect your Chrome to Quest</h3>
+          <p class="ok">Connected. You can close this tab.</p>
+          <p class="muted">Quest will say so in Telegram, and carries on from there.</p>
+        </div>
+      </div>
+      <div style="left:420px; top:96px">
+        <p class="arrow">Or type the code</p>
+        <img class="lift" src="/parts/popup-setup.png" style="display:block; width:280px; margin-top:12px">
+      </div>
+    </div>
+    <div class="brand" data-brand></div>
+  </section>
+</template>
+
+<template id="drafts">
+  <section class="shot">
+    <div class="copy">
+      <p class="eyebrow">Every message</p>
+      <h1>You decide <em>what goes out.</em></h1>
+      <p>Each person comes with a message written for them. Post it, edit it or skip it. Quest can also send on its own once your brief is settled.</p>
+      <p>Say “ask me first” and every message waits for your tap.</p>
+    </div>
+    <div class="stage"><img class="phone" src="/parts/phone-5.png" style="width:350px; left:180px; top:46px"></div>
+    <div class="brand" data-brand></div>
+  </section>
+</template>
+
+<template id="glass">
+  <section class="shot">
+    <div class="copy">
+      <p class="eyebrow">Nothing is hidden</p>
+      <h1>A report every evening, <em>and every step on record.</em></h1>
+      <p>Quest tells you who it found and who answered. Its page in Telegram shows what it is working on, every draft and post, and each step it took.</p>
+    </div>
+    <div class="stage">
+      <img class="phone" src="/parts/phone-6.png" style="width:310px; left:20px; top:70px">
+      <img class="phone" src="/parts/phone-7.png" style="width:310px; left:360px; top:70px">
+    </div>
+    <div class="brand" data-brand></div>
+  </section>
+</template>
+
+<template id="small">
+  <section class="tile-small">
+    <div data-visor></div>
+    <div><div class="wordmark">messaging<span>.quest</span></div><p>Finds people and talks to them for you.</p></div>
+  </section>
+</template>
+
+<template id="marquee">
+  <section class="marquee">
+    <div data-visor></div>
+    <div><div class="wordmark">messaging<span>.quest</span></div><h1>Finds people and talks to them, <em>so you don't have to.</em></h1></div>
+    <div class="crop"><img class="phone" src="/parts/phone-3.png"></div>
+  </section>
+</template>
+
+<script src="/brand/visor/render/mq.js"></script>
+<script>
+  const q = new URLSearchParams(location.search);
+
+  /** The Q mark as an icon: filling its square, or (`padded`) 96 px of art in 128 with 16 px clear. */
+  function mark(size, padded) {
+    const inner = MQ.original().replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
+    const tile = padded ? 384 : 512; // the tile's side in the 512 box
+    const scale = tile / 480; // the logo's own tile is 480 of its 512
+    const offset = 256 - 256 * scale;
+    // A slightly lighter edge keeps the dark tile visible on a dark page.
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="${size}" height="${size}"><style>.mq .tile { stroke: #34372c; stroke-width: ${padded ? 8 : 6}; }</style><g class="mq m-orig" transform="translate(${offset} ${offset}) scale(${scale})">${inner}</g></svg>`;
+  }
+
+  const done = async () => {
+    await document.fonts.ready;
+    await Promise.all([...document.images].map((img) => img.decode().catch(() => { throw new Error(`missing ${img.src}`); })));
+    window.__ready = true;
+  };
+
+  if (q.has("icon")) {
+    const size = Number(q.get("icon"));
+    document.body.innerHTML = `<div id="icon" style="width:${size}px;height:${size}px">${mark(size, size >= 128)}</div>`;
+    done();
+  } else {
+    const scene = document.getElementById(q.get("scene"));
+    document.body.append(scene.content.cloneNode(true));
+    for (const el of document.querySelectorAll("[data-brand]")) el.innerHTML = `${mark(28, false)}<span style="color:var(--ink)">messaging<span>.quest</span></span>`;
+    for (const el of document.querySelectorAll("[data-icon]")) el.innerHTML = mark(Number(el.dataset.icon) * 0.8, false);
+    for (const el of document.querySelectorAll("[data-visor]")) el.innerHTML = MQ.svg("bot", { state: "active", glow: true, still: true, label: "Quest" });
+    done();
+  }
+</script>
+</body></html>
