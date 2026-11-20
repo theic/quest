@@ -1,5 +1,5 @@
 import type { BaseChatModel } from "@langchain/core/language_models/chat_models";
-import { HumanMessage, ToolMessage } from "@langchain/core/messages";
+import { AIMessage, HumanMessage, ToolMessage } from "@langchain/core/messages";
 import type { BrowserScreen, ModelUsage } from "@mq/core";
 import type { StructuredToolInterface } from "@langchain/core/tools";
 import type { BaseCheckpointSaver } from "@langchain/langgraph";
@@ -31,6 +31,8 @@ export interface AgentBlueprint {
   readonly stepBudget: number;
   /** What to do with the last few steps, before the answer (see fewLeftNote). */
   readonly finishUp?: string;
+  /** When it gives words, the run ends with them as its answer, with no further model call (code decided there is nothing to do). */
+  readonly stopWith?: () => string | null;
   /** First pause before retrying a failed model call (tests shorten it). */
   readonly retryDelayMs?: number;
   /**
@@ -129,6 +131,8 @@ export function buildAgent(blueprint: AgentBlueprint, checkpointer: BaseCheckpoi
           return out;
         },
         wrapModelCall: async (request, handler) => {
+          const stop = blueprint.stopWith?.();
+          if (stop) return new AIMessage(stop) as never;
           const started = Date.now();
           try {
             const pictures = blueprint.images?.() ?? [];

@@ -232,7 +232,18 @@ export class TaskRunner {
 
     const { reader, posts } = this.#d.reach.forCustomer(task.customerId);
     const trail = new SearchTrail();
+    // A platform's routine run whose finder found nobody, and nothing to like, before anything was drafted ends there, by
+    // code: live, 2026-11-18 to 20, 48 of 90 such runs drafted nothing, about 47M tokens in two days of steps that only
+    // looked around after the search had come back empty.
+    let drafted = false;
+    let stop: string | null = null;
+    const nobodyFound = (source: string): void => {
+      if (drafted || stop || !task.title.endsWith(": people who need what they built")) return;
+      stop = `Found nobody on ${source} this run: the searches turned up no one who fits and nothing worth a like, and nothing was drafted. Ended by code.`;
+      log.info("tasks.ended_empty", { customerId: task.customerId, taskId: task.id, source });
+    };
     const ctx: SubagentContext = {
+      nobodyFound,
       customerId: task.customerId,
       taskId: task.id,
       browserSession: threadOf(task.id),
@@ -268,7 +279,9 @@ export class TaskRunner {
         // A task the customer asked for on one site works there only: its tools refuse the rest.
         tools: task.site ? pinToSite(tools, task.site) : tools,
         stepBudget: spec.stepBudget,
+        stopWith: () => stop,
         onTool: (tool, args) => {
+          if (tool === "outreach_draft" || tool === "draft") drafted = true;
           log.info("tasks.tool", { taskId: task.id, tool });
           this.#d.progress?.tool(task.id, tool, args);
         },

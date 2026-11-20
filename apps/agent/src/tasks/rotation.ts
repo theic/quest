@@ -570,6 +570,21 @@ export function nextExtra(
       return !why || STILL_POSTS.has(why);
     })
     .map((p) => underPosts(p, x.drafts.filter((d) => d.kind === "post" && d.status === "posted" && draftPlatform(d).key === p.key && (d.sentAt?.getTime() ?? 0) > now - 7 * DAY_MS).slice(0, 8).map((d) => (d.title ?? d.text).replace(/\s+/g, " ").slice(0, 90))));
+  // The short clocks hold only while something new came: an answer recorded there since that run last started. Live,
+  // 2026-11-18 to 20: 46 of 60 such runs drafted nothing, about 27M tokens in two days, mostly the same names and the
+  // same comments looked at again every two or three hours.
+  const answeredSince = (title: string, p: Platform | undefined): boolean => {
+    if (!p) return true;
+    const since = lastStarted(x.tasks, title);
+    return (x.results ?? []).some((r) => r.stage === "conversation" && r.at.getTime() > since && onPlatform(p, r.url));
+  };
+  const byTitle = new Map(picked.map((p) => [p.name, p]));
+  const platformOf = (e: Extra): Platform | undefined => byTitle.get(e.title.slice(0, e.title.indexOf(":")));
+  for (const e of [...waits, ...comments]) {
+    if (e.every === WAITING_EVERY_MS || e.every === UNDER_POSTS_EVERY_MS) {
+      if (!answeredSince(e.title, platformOf(e))) (e as { every: number }).every = e.title.endsWith(WAITS) ? INBOX_EVERY_MS : UNDER_OLD_POSTS_EVERY_MS;
+    }
+  }
   const all = [...waits, ...comments, ...EXTRAS, ...posts];
   const titles = new Set(all.map((e) => e.title));
   const last = x.tasks.reduce<Task | null>((a, t) => (!a || t.createdAt > a.createdAt ? t : a), null);

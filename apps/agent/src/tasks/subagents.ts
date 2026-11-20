@@ -12,6 +12,8 @@ import type { SearchTrail } from "./search-trail.ts";
 
 /** What a subagent's tools may use while working on one task. */
 export interface SubagentContext {
+  /** find_people's searches found nobody and nothing worth a like: the runner may end the run there. */
+  readonly nobodyFound?: (source: string) => void;
   readonly customerId: CustomerId;
   readonly taskId: TaskId;
   readonly reader: PageReader;

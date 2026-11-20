@@ -1616,6 +1616,15 @@ side panel's own routes (`scripts/try-panel.ts`) stood in for it.
   had lost Postgres's empty folders, and PGlite (0.5.8 and 0.5.15 alike) stopped at "could not open directory
   pg_notify", every row still there. `startLocalDb` now puts the twelve empty folders back before it opens: a copy of
   that folder opened with its 37 finds and 4 drafts. Installs keep `~/.quest`, not Temp, but a cleaner can reach it too.
+- **Installed from GitHub by Claude Code** (a clone of github.com/theic/quest at 247bca9, `QUEST_HOME` in the home
+  folder, AppData moved aside so the Startup folder was left alone): one sentence, Quest answering on 8787 with Claude,
+  and the two steps for the person. Until the store approves 0.16.0 its link gives the old extension, which pairs only
+  with production, so a weekend install cannot pair with its own Quest.
+- **The hosted run in a real Chrome** (the dev extension against dev in hosted mode, no Telegram, 2026-11-20 evening):
+  "Start talking" made a customer on the `web` channel and paired the Chrome; its first turn began from a match page the
+  extension still kept from an earlier landing visit (`customers.met`, `page: true`), as someone arriving from a page
+  does; the sweep started, and the founder's pause stopped its searches ("unavailable", each a `sweep.search_failed`).
+  No error line.
 - **Hosted after the deploy** (main at 678975f, Fly v137, 15:57). Up at 15:57:35, health 200, `/people/recent` with no key
   401; two customers' Chromes back within 20 s; nothing sending or queued in the outbox and no run at work (read only:
   nothing sent as them). The public repository, github.com/theic/quest, is the same tree as the branch.

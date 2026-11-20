@@ -197,6 +197,7 @@ export function findPeopleTool(ctx: SubagentContext, seen: SeenPages, streak: Se
       seen.record(l.post.url, l.post.text, l.post);
       likeOnly.add(l.post.url);
     }
+    if (!found.picks.length && !found.likes.length) ctx.nobodyFound?.(source);
     return foundText(found, { source, within: within ?? "week" });
   }
 }
