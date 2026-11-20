@@ -1602,6 +1602,14 @@ side panel's own routes (`scripts/try-panel.ts`) stood in for it.
   the models until the time it named, three runs it ended left X open, and two real failures still rested it. Found on
   the way: a no sent with a platform's name ("bluesky") instead of its site (`contactSite`, "bsky.app") removes nobody;
   the agent always sends the site.
+- **First run, hosted** (the dev agent in hosted mode, the panel's routes standing in for the release extension, no
+  Telegram; 16:01). "Start talking" made a customer, what they build was answered in 16 s with the plan and a question,
+  and Quest asked for their Chrome. The people found need a real Chrome on it, as in the local run.
+- **Telegram's /off and /on, and the report** (@TestPatrikBot, the dev founder, off before and after). /on answered "I'm
+  back on" and /off "Browsing is off ... I still answer here", each set `off_at` as said. Asked for today's report, the
+  manager wrote a summary but no page: the page went only at the evening hour. Now a message that asks for the report
+  ("send me today's report") makes the turn a report turn (`ASKS_REPORT`), and the page came with its button; it opened
+  on the tunnel with the day's asks and the week's answers by platform. No error line in either dev run.
 - **Hosted after the deploy** (main at 678975f, Fly v137, 15:57). Up at 15:57:35, health 200, `/people/recent` with no key
   401; two customers' Chromes back within 20 s; nothing sending or queued in the outbox and no run at work (read only:
   nothing sent as them). The public repository, github.com/theic/quest, is the same tree as the branch.

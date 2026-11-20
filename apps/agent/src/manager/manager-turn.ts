@@ -51,6 +51,9 @@ import { managerPrompt } from "./prompt.ts";
 import { managerTools, startedOnItsOwn, TALKING_MS, UNATTENDED_STARTS_A_DAY, type ChromeAccess } from "./tools.ts";
 import type { CustomerBrowser } from "../chrome/browser.ts";
 import { ASKS_PROGRESS, chatPulse, renderTurn, type ChatPulse } from "./turn-input.ts";
+
+/** Their message asks for the day's report now. */
+const ASKS_REPORT = /\b(?:the|today'?s|my|daily|day'?s|evening|tonight'?s)\s+report\b|\breport\s+(?:now|for today)\b/i;
 import type { FindBoard } from "../finds/find-service.ts";
 import type { BoardCounts } from "../tasks/task-service.ts";
 import type { ManagerActivity } from "../tasks/task-board.ts";
@@ -265,7 +268,8 @@ export class ManagerTurn {
       }
     }
     const now = d.clock.now();
-    const reportDue = events.some((e) => e.event.kind === "day_report");
+    // The evening's report, or one they ask for now ("send me today's report"): the page goes either way.
+    const reportDue = events.some((e) => e.event.kind === "day_report" || (e.event.kind === "user_message" && ASKS_REPORT.test(e.event.text)));
     const [customer, board, open, finds, places, chrome, transcript, memories, day, drafts, approved, globalApproved] = await Promise.all([
       d.customers.get(customerId),
       d.tasks.counts(customerId),
