@@ -1593,3 +1593,15 @@ side panel's own routes (`scripts/try-panel.ts`) stood in for it.
   Telegram" link joined that chat to the same customer (`customers.telegram_joined`, 10:43:26), and their first message
   there was answered in 36 s, with a 👍 on it, while Quest was paused from the panel's bar (since 10:09): paused, the
   manager still answers and nothing browses; the held Like's look waited for on (`held.look_failed`, "switched off").
+- **Brakes, a no and the model limit, fed by script** (`scripts/try-brakes.ts`: a fresh PGlite with every migration and
+  the classes main.ts wires; 16:00). All 14 held: "are you a bot?" paused Bluesky's replies and only those, a reply taken
+  down paused LinkedIn's, answers on X falling from 40% to 3% of what went up paused X's, and each said so once; the three
+  brakes were rows that a restart loaded again, and a go-ahead on X lifted X alone. A no was kept for the person (found on
+  another post of theirs, after a restart, and in a tag under someone else's post), left someone else free, and
+  `/people/no` took them out of the shared list, where a new sighting did not bring them back. A usage limit rested
+  the models until the time it named, three runs it ended left X open, and two real failures still rested it. Found on
+  the way: a no sent with a platform's name ("bluesky") instead of its site (`contactSite`, "bsky.app") removes nobody;
+  the agent always sends the site.
+- **Hosted after the deploy** (main at 678975f, Fly v137, 15:57). Up at 15:57:35, health 200, `/people/recent` with no key
+  401; two customers' Chromes back within 20 s; nothing sending or queued in the outbox and no run at work (read only:
+  nothing sent as them). The public repository, github.com/theic/quest, is the same tree as the branch.
