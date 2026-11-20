@@ -1610,6 +1610,12 @@ side panel's own routes (`scripts/try-panel.ts`) stood in for it.
   manager wrote a summary but no page: the page went only at the evening hour. Now a message that asks for the report
   ("send me today's report") makes the turn a report turn (`ASKS_REPORT`), and the page came with its button; it opened
   on the tunnel with the day's asks and the week's answers by platform. No error line in either dev run.
+- **The Like stopped mid-send never went up** (16:17, read on X in the founder's Chrome, nothing pressed): the post shows
+  "0 Likes. Like". Killed while the poster prepared it, held as maybe sent, and neither sent nor sent twice.
+- **A local database Postgres would not open.** Six hours after its last stop, the install's folder (in Windows' Temp)
+  had lost Postgres's empty folders, and PGlite (0.5.8 and 0.5.15 alike) stopped at "could not open directory
+  pg_notify", every row still there. `startLocalDb` now puts the twelve empty folders back before it opens: a copy of
+  that folder opened with its 37 finds and 4 drafts. Installs keep `~/.quest`, not Temp, but a cleaner can reach it too.
 - **Hosted after the deploy** (main at 678975f, Fly v137, 15:57). Up at 15:57:35, health 200, `/people/recent` with no key
   401; two customers' Chromes back within 20 s; nothing sending or queued in the outbox and no run at work (read only:
   nothing sent as them). The public repository, github.com/theic/quest, is the same tree as the branch.

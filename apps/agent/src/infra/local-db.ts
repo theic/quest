@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { PGlite } from "@electric-sql/pglite";
 import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
@@ -13,7 +13,15 @@ import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
  * `auth.users` with the columns the migrations touch, and pg_cron and pg_net as functions that do nothing (a laptop
  * does not sleep, so nothing needs waking; the loops run in the agent). Each migration runs once, recorded by file name.
  */
+/**
+ * Postgres's folders that are empty between runs. A tool that clears empty folders (Windows' Temp cleanup did, on the
+ * end-to-end sitting, 2026-11-20) leaves a database Postgres will not open ("could not open directory pg_notify") though
+ * every row is there, so they are put back before it starts.
+ */
+const EMPTY_DIRS = ["pg_notify", "pg_snapshots", "pg_stat", "pg_stat_tmp", "pg_tblspc", "pg_twophase", "pg_replslot", "pg_serial", "pg_dynshmem", "pg_commit_ts", "pg_logical/snapshots", "pg_logical/mappings"];
+
 export async function startLocalDb(o: { dataDir: string; migrations: string; port: number }): Promise<{ url: string; close(): Promise<void> }> {
+  if (existsSync(join(o.dataDir, "PG_VERSION"))) for (const d of EMPTY_DIRS) mkdirSync(join(o.dataDir, d), { recursive: true });
   const db = await PGlite.create({ dataDir: o.dataDir, extensions: { pgcrypto } });
   const F = "$f$";
   const fresh = !(await db.query<{ n: number }>(`select count(*)::int n from pg_namespace where nspname = 'quest_local'`)).rows[0]!.n;
