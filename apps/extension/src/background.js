@@ -34,7 +34,7 @@
 import { syncAwake } from "./awake.js";
 import { attachFile, browserPage, domQuiet, loadMore, scrollPage } from "./browser-page.js";
 import { questOverlay } from "./cursor.js";
-import { focusedSensitive, holdInput, protectPicture, released, trustedFill, typedCheck, visualAllowed, visualInput, visualPicture } from "./browser-visual.js";
+import { cropPicture, focusedSensitive, holdInput, postBox, protectPicture, released, trustedFill, typedCheck, visualAllowed, visualInput, visualPicture } from "./browser-visual.js";
 
 // The debugger came off a tab of Quest's (it closed, or the customer cancelled it on Chrome's bar): put on again when needed.
 chrome.debugger?.onDetach?.addListener((source) => { if (source.tabId !== undefined) released(source.tabId); });
@@ -731,7 +731,7 @@ async function quiet(tabId, maxMs) {
 /** Does the session's action in its tab; a failure to answer with, or nothing when it went through. */
 async function act(tab, job, shotKey) {
   const visual = ["click_point", "move_point", "type_text", "press_focused", "scroll_point"].includes(job.action.kind);
-  if (visual || job.action.kind === "screenshot") {
+  if (visual || job.action.kind === "screenshot" || job.action.kind === "shot") {
     if (!visualAllowed(await chrome.storage.local.get("visual"))) return fail("refused", "Enable visual browser controls in Quest's extension popup, then try again.");
     if (visual) {
       const shot = (await chrome.storage.session.get(shotKey))[shotKey];
@@ -847,6 +847,20 @@ async function sessionView(tabId, job, shotKey) {
       await chrome.storage.session.set({ [shotKey]: { ...meta, url: tab.url } });
       view.screen = { id: picture.id, image, width: picture.width, height: picture.height };
     } finally {
+      await inject({ target: { tabId: tab.id, allFrames: true }, func: protectPicture, args: [false] }, 5000).catch(() => undefined);
+      await overlay(tab.id, { kind: "unhide" });
+    }
+  }
+  // One post's picture, cut to its box: shown with a reply that lists people, so they can see who before opening it.
+  if (job.action.kind === "shot") {
+    if (/\/(?:login|signin|sign-in|password|oauth|billing|payment)(?:\/|\?|$)/i.test(tab.url)) return fail("refused", "Sign-in and account pages are not pictured.");
+    const box = await inPage(tab.id, postBox, [job.action.quote ?? ""], 5000);
+    if (!box || box.width < 50 || box.height < 30) return fail("unavailable", "The post is not on this page.");
+    await sleep(700);
+    await inject({ target: { tabId: tab.id, allFrames: true }, func: protectPicture, args: [true] }, 5000);
+    await overlay(tab.id, { kind: "hide" });
+    try { view.shot = await cropPicture(await visualPicture(chrome.debugger, tab.id, 90), box); }
+    finally {
       await inject({ target: { tabId: tab.id, allFrames: true }, func: protectPicture, args: [false] }, 5000).catch(() => undefined);
       await overlay(tab.id, { kind: "unhide" });
     }

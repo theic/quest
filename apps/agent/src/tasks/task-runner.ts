@@ -72,7 +72,7 @@ export interface TaskRunnerDeps {
   /** People for a play, found by code: outreach's find_people. */
   readonly finder?: PlayFinder;
   /** A page of people for what someone built: outreach's page_for. */
-  readonly pageFor?: (customerId: CustomerId, who: { readonly maker: string; readonly url: string; readonly made: string }) => Promise<{ readonly link: string; readonly people: number } | string>;
+  readonly pageFor?: (customerId: CustomerId, who: { readonly maker: string; readonly url: string; readonly made: string }) => Promise<{ readonly link: string; readonly people: number; readonly shots?: readonly string[] } | string>;
   /** People who need each other, matched by code: outreach's find_pairs. */
   readonly pairs?: PairFinder;
   /** The shared cache of people: what a check finds that is public goes there too. */

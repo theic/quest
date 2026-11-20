@@ -317,12 +317,15 @@ export class PairFinder {
    * to `cap` people.
    */
   async moreFor(customerId: CustomerId, launch: FoundPost, posts: PostSearch, cap: number): Promise<Pair[]> {
+    // Every phrase on another site in turn, so a page lists people from several (the founder, 2026-11-20: "from
+    // different sites"); it was Bluesky and X only.
     const offered = new Set(posts.sources().map((s) => s.name));
-    if (!offered.has("bluesky")) return [];
+    const sites = ["bluesky", "x", "reddit", "linkedin", "hackernews", "threads"].filter((s) => offered.has(s));
+    if (!sites.length) return [];
     let n = 0;
-    const found = await this.#needsFor(customerId, null, [{ ...launch, side: "launch" }], (query, on) => {
-      const x = offered.has("x") && (on === "x" || n++ % 2 === 1);
-      return posts.search({ source: x ? "x" : "bluesky", query: `"${query}"`, within: "week", limit: 25 });
+    const found = await this.#needsFor(customerId, null, [{ ...launch, side: "launch" }], (query) => {
+      const source = sites[n++ % sites.length]!;
+      return posts.search({ source, query: source === "bluesky" || source === "x" ? `"${query}"` : query, within: "week", limit: 25 });
     }, cap, Date.now());
     await this.#known?.saw(found.map((f) => f.ask)).catch(() => undefined);
     return found;

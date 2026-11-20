@@ -40,6 +40,10 @@ import { Acquaintances } from "./contacts/acquaintances.ts";
 import { PgContacts } from "./infra/pg-contacts.ts";
 import { PgSaidNo } from "./infra/pg-said-no.ts";
 import { SaidNo } from "./contacts/said-no.ts";
+import { emailCompose, theirChannel } from "./contacts/their-channel.ts";
+import { quoteAppears } from "./tasks/seen-pages.ts";
+import { leadCheck } from "./finds/lead-check.ts";
+import { picturesOn, PostShots } from "./chrome/post-shots.ts";
 import { Power } from "./lifecycle/power.ts";
 import { productNames, saysYes, titled, WarmUp } from "./drafts/warm-up.ts";
 import { IdeaService } from "./ideas/idea-service.ts";
@@ -98,7 +102,7 @@ import { reportRoutes } from "./http/report-routes.ts";
 import { namesTheirs } from "./drafts/warm-up.ts";
 import { PgDraftMarks } from "./infra/pg-draft-marks.ts";
 import { atTheirTime, theirHour, wall } from "./lib/their-time.ts";
-import { doneDraft, pagePeople, everyoneFor, introductionDraft, Introducer, introsOf, linkStep, linksOf, MATCH_MAX, nameDraft, pageDraft, stepTwoDraft } from "./finds/introducer.ts";
+import { doneDraft, pagePeople, everyoneFor, introductionDraft, Introducer, introsOf, linkStep, linksOf, MATCH_MAX, MATCH_MIN, nameDraft, pageDraft, stepTwoDraft } from "./finds/introducer.ts";
 import { handleOf } from "./contacts/handles.ts";
 import { matchPageUrl, PgKnownPeople } from "./infra/pg-known.ts";
 import { PlayFinder } from "./finds/play-finder.ts";
@@ -222,6 +226,7 @@ const writer = new Writer({ models, voice: voiceFrom({ customers, memory, transc
 // A person's moment before each click, keystroke and scroll, never the same twice (the founder, 2026-11-04: "organically, with random
 // pauses between actions").
 const browser = new CustomerBrowser(broker, guard, vision, { pauses: { act: [1_200, 4_500], scroll: [700, 2_500] } });
+const postShots = new PostShots({ browser, db: pool, log });
 // The work going on, kept as it goes: their page draws it live, and their chat's Quest button says how many runs are at it.
 const board = new TaskBoard({ channels, customers, boards: new PgBoards(pool), paces: (since) => taskStore.paces(since), clock: systemClock, log });
 // What acts as the customer on a site goes there one at a time, in turn.
@@ -342,7 +347,7 @@ const saidNo = new SaidNo({
     await known.forget(no.site, no.person).catch(() => {});
   },
 });
-const drafts = new DraftService({ marks, saidNo, answeredSince: async (id, person, since) => { const k = whoKey(person); return k.length >= 3 && (await results.list(id, 300)).some((r) => r.stage === "conversation" && r.at > since && (whoKey(r.person) === k || whoKey(r.person).includes(k) || k.includes(whoKey(r.person) || "\u0000"))); }, drafts: draftStore, finds: findStore, places, messenger, deck, poster, errands, outbox, autopilot, writer, warmUp, people, files: ideas, handOff: { mint: async (note) => { const code = await invites.mint(note); return code && config.stage === "dev" ? `t${code}` : code; }, seller: async (id) => /(^|[./])messaging\.quest\b/i.test((await customers.get(id)).siteUrl ?? "") }, clock: systemClock, log, events });
+const drafts = new DraftService({ marks, saidNo, answeredSince: async (id, person, since) => { const k = whoKey(person); return k.length >= 3 && (await results.list(id, 300)).some((r) => r.stage === "conversation" && r.at > since && (whoKey(r.person) === k || whoKey(r.person).includes(k) || k.includes(whoKey(r.person) || "\u0000"))); }, drafts: draftStore, finds: findStore, places, messenger, deck, poster, errands, outbox, autopilot, writer, warmUp, people, files: { files: async (id, ids) => [...(await ideas.files(id, ids)), ...(await postShots.files(id, ids))] }, handOff: { mint: async (note) => { const code = await invites.mint(note); return code && config.stage === "dev" ? `t${code}` : code; }, seller: async (id) => /(^|[./])messaging\.quest\b/i.test((await customers.get(id)).siteUrl ?? "") }, clock: systemClock, log, events });
 // "Here's what I'm sending": what goes up by itself is shown first, one message a day in their chat and a list in the panel.
 const outList = new OutList({
   outbox: { waiting: (id) => outbox.waiting(id) },
@@ -474,7 +479,7 @@ const turn = new ManagerTurn({
   energy,
   sweep,
   // Always exploring: the rotation's runs count against the day's starts too, so the manager keeps room for its own.
-  ...(config.alwaysExploring ? { startsADay: EXPLORING_STARTS_A_DAY, exploring: true } : {}),
+  ...(config.answerOnly ? { startsADay: 0 } : config.alwaysExploring ? { startsADay: EXPLORING_STARTS_A_DAY, exploring: true } : {}),
   clock: systemClock,
   log,
 });
@@ -490,7 +495,7 @@ const known = config.sharedPeople ? new SharedPeople({ local: new PgKnownPeople(
 const finder = new PlayFinder({ models, customers, memory, finds, searches, drafts, known, spend, log });
 const pairs = new PairFinder({ models, drafts, spend, known, log });
 const runner = new TaskRunner(
-  { progress: board, queue: taskStore, tasks: taskStore, questions, events, catalog, models, reach, customers, finds, places, memory, checkpointer, spend, searches, finder, pairs, pageFor: (id, who) => makePage(id, who), known, people, seats: config.agentSeats, log, browser, drafts, chromeOnline: (id) => broker.online(id) },
+  { progress: board, queue: taskStore, tasks: taskStore, questions, events, catalog, models, reach, customers, finds, places, memory, checkpointer, spend, searches, finder, pairs, pageFor: (id, who) => makePage(id, who, true), known, people, seats: config.agentSeats, log, browser, drafts, chromeOnline: (id) => broker.online(id) },
   { worker: config.worker, concurrency: config.taskConcurrency, perCustomer: config.tasksPerCustomer,
     // One run in their Chrome at a time (the founder, 2026-11-14: "the tasks themselves must not interfere and conflict with each other"); the researcher, which only reads, runs beside it.
     solo: catalog.names().filter((n) => n !== "researcher" && catalog.get(n)?.needsChrome),
@@ -571,15 +576,31 @@ const matchPageLive = async (): Promise<boolean> => {
 };
 // A page of people asking for what someone built, for someone nobody was introduced to (a link left under a thread, a
 // yes to "want a page?"): one search for their thing alone, and the page says "found", not "got your link".
-const makePage = async (id: CustomerId, who: { readonly maker: string; readonly url: string; readonly made: string }): Promise<{ readonly link: string; readonly people: number } | string> => {
+// Every lead read again before it goes on a page (the founder, 2026-11-20: "double check the leads you find"): a post
+// read now that no longer holds their words is left off (one that cannot be read now stays: the search saw it a moment
+// ago), and so is anyone a second, stricter judge does not see plainly needing what the maker made (finds/lead-check.ts).
+const stillThere = async <T extends { readonly url: string; readonly quote: string; readonly author?: string | null }>(id: CustomerId, people: readonly T[], made: string | null): Promise<T[]> => {
+  const reader = reach.forCustomer(id).reader;
+  const kept = await Promise.all(people.map(async (p) => {
+    const page = await Promise.race([reader.readPage(p.url).catch(() => null), new Promise<null>((r) => setTimeout(() => r(null), 45_000))]);
+    return !page || quoteAppears(p.quote.replace(/…$/, "").slice(0, 120), page.text) ? p : null;
+  }));
+  const there = kept.filter((p): p is Awaited<T> & T => p !== null);
+  const out = made ? await leadCheck(models, id, made, there) : there;
+  if (out.length < people.length) log.info("page.leads_dropped", { customerId: id, gone: people.length - there.length, unfit: there.length - out.length });
+  return out;
+};
+const makePage = async (id: CustomerId, who: { readonly maker: string; readonly url: string; readonly made: string }, pictured = false): Promise<{ readonly link: string; readonly people: number; readonly listed: readonly { url: string; quote: string }[]; readonly shots?: readonly string[] } | string> => {
   if (!(await matchPageLive())) return "Pages are not live yet.";
   const launch = { source: "page", url: who.url, author: who.maker, title: null, text: who.made.slice(0, 600), postedAt: null, replies: null };
   const found = await Promise.race([pairs.moreFor(id, launch, reach.forCustomer(id).posts, MATCH_MAX + 2), new Promise<never[]>((r) => setTimeout(() => r([]), 120_000))]);
-  const listed = pagePeople(found, who.maker);
-  if (listed.length < 2) return "Too few people asking for that this week to make a page.";
+  const listed = await stillThere(id, pagePeople(found, who.maker), who.made);
+  if (listed.length < MATCH_MIN) return `Too few people asking for that this week to make a page (${listed.length}, a page needs ${MATCH_MIN}).`;
   const code = await known.keepPage(id, { maker: who.maker, made: who.made, launchUrl: who.url, people: listed, sent: false });
   log.info("page.made", { customerId: id, people: listed.length });
-  return { link: matchPageUrl(code, config.stage === "dev"), people: listed.length };
+  // For a teammate's reply under their post: pictures of a few of the posts, where that site takes them.
+  const shots = pictured && picturesOn(who.url) ? await postShots.take(id, listed, picturesOn(who.url)).catch(() => []) : [];
+  return { link: matchPageUrl(code, config.stage === "dev"), people: listed.length, listed, shots };
 };
 // A platform whose answers dropped sharply is braked: looked at every three hours for whoever's Chrome is open.
 const rateLook = setInterval(() => {
@@ -599,6 +620,20 @@ const watch = new ReplyWatch(
     },
     // A words-first introduction's plan keeps the links offered: the first answer gets them, a later one the step after.
     nextStep: async (id, a) => {
+      // The words back to them go where they asked: an email they gave, a DM they asked for, else under their answer.
+      // With a page's link, pictures of a few of its posts go too, where the site takes pictures in a reply.
+      const answer = async (text: string, extra: { theirs?: true; helps?: true; ask?: string }, subject = "The people I found for you", shots: readonly { url: string; quote: string }[] = []): Promise<boolean> => {
+        const where = theirChannel(a.quote);
+        const profile = where === "dm" ? await people.profileFor(id, a.url, a.author).catch(() => null) : null;
+        const to = where && typeof where === "object"
+          ? { kind: "message" as const, url: emailCompose(where.email, subject), target: where.email, title: subject }
+          : { kind: profile ? ("message" as const) : ("reply" as const), url: profile ?? a.url, target: a.author };
+        const room = picturesOn(to.url);
+        const assets = shots.length && room ? await postShots.take(id, shots, room).catch(() => []) : [];
+        const out = await drafts.offer(id, { platform: "browser", ...to, text, quote: a.quote, author: a.author, ...extra, ...(assets.length ? { assets } : {}) });
+        if (typeof out === "string") log.info("intro.not_written", { customerId: id, url: a.url, why: out.slice(0, 160) });
+        return typeof out !== "string";
+      };
       const links = linksOf(a.plan);
       // What passed with them, also past the 400 newest (live, 2026-11-16: likes and follows had pushed seven makers'
       // openers, two days old, out of that window, so their "yes, go ahead" found no offer of ours and nothing followed).
@@ -645,7 +680,7 @@ const watch = new ReplyWatch(
         // busy site was lost for good (live, 2026-11-15: ten makers said "go ahead" on Bluesky and nobody was introduced).
         // The outbox still keeps the site's gap between them.
         // Only whoever asked for such a thing gets the link; the rest are on the maker's page, not written to.
-        const fits = everyone.filter((i) => !i.asked && !told(i.url));
+        const fits = await stillThere(id, everyone.filter((i) => !i.asked && !told(i.url)), intros[0]!.made ?? null);
         for (const i of everyone.filter((x) => x.asked && !told(x.url))) {
           const out = await drafts.offer(id, { platform: "browser", kind: "reply", url: i.url, target: i.author, text: introductionDraft(i), quote: i.quote, author: i.author, helps: true });
           if (typeof out !== "string") done.push(i.url);
@@ -655,11 +690,12 @@ const watch = new ReplyWatch(
         log.info("intro.yes", { customerId: id, person: answerer, told: intros.length, reached: done.length, fits: fits.length });
         // Their page: everyone their link went to, on an address of Quest's own, in place of the posts one by one and of
         // the product's name (the founder, 2026-11-17). Only once the landing serves it; until then, as before.
-        if (await matchPageLive()) {
+        // A page lists at least MATCH_MIN people; with fewer, the posts go to them as before.
+        if (done.length + fits.length >= MATCH_MIN && (await matchPageLive())) {
           const reached = everyone.filter((i) => done.includes(i.url));
           const code = await known.keepPage(id, { maker: a.author, made: intros[0]!.made ?? null, launchUrl: intros[0]!.launch, people: [...reached.map((i) => ({ author: i.author, quote: i.quote, url: i.url })), ...fits.map((i) => ({ author: i.author, quote: i.quote, url: i.url, fit: true }))] }).catch(() => null);
           const firstName = (await customers.get(id)).displayName?.trim().split(/\s+/)[0] || null;
-          if (code) return typeof (await drafts.offer(id, { platform: "browser", kind: "reply", url: a.url, target: a.author, text: pageDraft(matchPageUrl(code, config.stage === "dev"), reached.length, firstName, Math.random, fits.length), quote: a.quote, author: a.author, theirs: true })) !== "string";
+          if (code) return answer(pageDraft(matchPageUrl(code, config.stage === "dev"), reached.length, firstName, Math.random, fits.length), { theirs: true }, undefined, [...reached, ...fits].map((i) => ({ url: i.url, quote: i.quote })));
         }
         if (!done.length) return false;
         // The name goes with "done" (live, 2026-11-14: of 55 who answered in three days nobody had heard what Quest is;
@@ -667,7 +703,7 @@ const watch = new ReplyWatch(
         const me = await customers.get(id);
         const product = titled(productNames(me.siteUrl));
         const named = product ? nameDraft(product) : null;
-        return typeof (await drafts.offer(id, { platform: "browser", kind: "reply", url: a.url, target: a.author, text: `${doneDraft(done, me.displayName?.trim().split(/\s+/)[0] || null)}${named ? ` ${named.text}` : ""}`, quote: a.quote, author: a.author, helps: true, ...(named ? { ask: named.ask } : {}) })) !== "string";
+        return answer(`${doneDraft(done, me.displayName?.trim().split(/\s+/)[0] || null)}${named ? ` ${named.text}` : ""}`, { helps: true, ...(named ? { ask: named.ask } : {}) });
       }
       // A yes to "want a page?" (step two offers one): people asking for what they built, found now and put on a page
       // of their own, whose button is the way on to Quest. Once; with nobody found, the manager answers.
@@ -680,7 +716,7 @@ const watch = new ReplyWatch(
           return false;
         }
         const firstName = (await customers.get(id)).displayName?.trim().split(/\s+/)[0] || null;
-        return typeof (await drafts.offer(id, { platform: "browser", kind: "reply", url: a.url, target: a.author, text: pageDraft(page.link, 0, firstName), quote: a.quote, author: a.author, theirs: true })) !== "string";
+        return answer(pageDraft(page.link, 0, firstName, Math.random, page.people), { theirs: true }, undefined, page.listed);
       }
       // Their next answer, whatever it says, gets the name and the one ask back (the founder, 2026-11-14), unless they
       // have it already. So does anyone with a plan who answers a second time: step three is the name.
@@ -694,7 +730,7 @@ const watch = new ReplyWatch(
         const product = await toldName();
         if (!product) return false;
         const named = nameDraft(product);
-        return typeof (await drafts.offer(id, { platform: "browser", kind: "reply", url: a.url, target: a.author, text: named.text, quote: a.quote, author: a.author, helps: true, ask: named.ask })) !== "string";
+        return answer(named.text, { helps: true, ask: named.ask }, product);
       }
       // Each step once (live, 2026-11-13: @jerrylee_maker had been told at 10:31 that more people could come, answered
       // again, and code offered the same in other words at 16:39): past the plan's steps, the manager answers, seeing the thread.
@@ -704,7 +740,7 @@ const watch = new ReplyWatch(
       const expected = giveLinks ? 1 : links.length ? 2 : 1;
       if (!answerer || declined || ours !== expected) return false;
       const text = giveLinks ? linkStep(links) : stepTwoDraft();
-      return typeof (await drafts.offer(id, { platform: "browser", kind: "reply", url: a.url, target: a.author, text, quote: a.quote, author: a.author, helps: true })) !== "string";
+      return answer(text, { helps: true });
     },
     likeAnswer: async (id, a) => typeof (await drafts.offer(id, { platform: "browser", kind: "like", url: a.url, target: a.author, text: "", quote: a.quote, author: a.author })) !== "string",
     answers: new AnswerReader({ models, spend, log }), wakeManager: () => manager.wake(), clock: systemClock, log },
@@ -723,7 +759,7 @@ const weekNumbers = async (id: CustomerId): Promise<string | null> => {
        (select coalesce(sum(jsonb_array_length(people)), 0) from mq.match_pages where customer_id = $1 and created_at > now() - interval '7 days') as listed,
        (select count(*) from mq.drafts where customer_id = $1 and kind in ('reply', 'message', 'post') and sent_at > now() - interval '7 days') as words,
        (select count(distinct platform) from mq.drafts where customer_id = $1 and sent_at > now() - interval '7 days') as sites,
-       (select count(distinct person) from mq.results where customer_id = $1 and stage = 'conversation' and at > now() - interval '7 days') as answered`,
+       (select count(distinct person) from mq.results where customer_id = $1 and stage = 'conversation' and created_at > now() - interval '7 days') as answered`,
     [id],
   );
   const r = rows[0];
@@ -760,12 +796,13 @@ const rotation = config.alwaysExploring
       sending: async (id) => (await outbox.waiting(id)).some((i) => i.status === "sending" || i.dueAt.getTime() <= Date.now()),
       // One run in their Chrome at a time: two took the front of their window from each other.
       perCustomer: 1,
+      answerOnly: config.answerOnly,
       now: () => systemClock.now(),
       log,
     })
   : null;
 // Introductions by code: the matcher on a clock, and a reply to everyone who can be answered where they posted.
-const introducer = config.alwaysExploring
+const introducer = config.alwaysExploring && !config.answerOnly
   ? new Introducer({
       online: () => broker.onlineCustomers(),
       allowed: async (id) => {

@@ -39,6 +39,7 @@ const View = z.object({
   text: z.string().max(100000),
   frames: z.array(z.string().max(4000)).max(100).optional(),
   screen: z.object({ id: z.string().max(100), image: z.string().max(1500000).refine((value) => value.startsWith("data:image/jpeg;base64,") || value.startsWith("data:image/png;base64,")), width: z.number().int().positive().max(10000), height: z.number().int().positive().max(10000) }).optional(),
+  shot: z.object({ image: z.string().max(1500000).refine((value) => value.startsWith("data:image/jpeg;base64,")), width: z.number().int().positive().max(10000), height: z.number().int().positive().max(10000) }).optional(),
   controls: z.array(Control).max(1500),
   items: z.array(z.string().max(400)).max(100).optional(),
   scroll: z.object({ y: z.number().int(), height: z.number().int().min(0), viewport: z.number().int().min(0) }).optional(),

@@ -123,7 +123,7 @@ export class Messenger {
     text = systemMessage(language, text);
     links = links.map((link) => ({ ...link, label: forLanguage(language)(link.label) }));
     const ref = await this.#channels.get(to.kind).sendLinks(to, text, links);
-    await this.#transcript.recordOutgoing(customerId, to.kind, ref, [text, ...links.map((l) => `[${l.label}]`)].join("\n"));
+    await this.#transcript.recordOutgoing(customerId, to.kind, ref, [text, ...links.map((l) => `[${l.label}](${l.url})`)].join("\n"));
   }
 
   /** Sends a question with its answer buttons; returns the message ref a reply will point at. */

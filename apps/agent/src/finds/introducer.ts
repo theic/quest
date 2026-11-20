@@ -173,7 +173,21 @@ export function doneDraft(urls: readonly string[], name: string | null = null, r
 }
 
 /** How many people a maker's link goes to on one yes: the ones they were told of, and more found for them then. */
-export const MATCH_MAX = 6;
+export const MATCH_MAX = 8;
+/** No page with fewer (the founder, 2026-11-20: "it should never contain less than three leads, ideally more, from different sites"). */
+export const MATCH_MIN = 3;
+
+/** One from each site in turn, so a short list still shows several sites: whoever asked first within each. */
+export function acrossSites<T extends { readonly url: string }>(people: readonly T[], max: number): T[] {
+  const bySite = new Map<string, T[]>();
+  for (const p of people) {
+    const s = contactSite(p.url) ?? "other";
+    bySite.set(s, [...(bySite.get(s) ?? []), p]);
+  }
+  const out: T[] = [];
+  for (let i = 0; out.length < max && [...bySite.values()].some((l) => l.length > i); i++) for (const l of bySite.values()) if (l[i] && out.length < max) out.push(l[i]!);
+  return out;
+}
 
 /**
  * Everyone a maker's link goes to once they said yes (the founder, 2026-11-17: "I want it to provide more then one lead
@@ -205,7 +219,7 @@ export async function everyoneFor(
   }
   // Whoever asked first: they are the ones the link goes to.
   const all = [...intros.map((i) => ({ ...i, asked: i.asked ?? askedAt.get(i.url) ?? false })), ...extra];
-  return [...all.filter((i) => i.asked), ...all.filter((i) => !i.asked)].slice(0, MATCH_MAX);
+  return acrossSites([...all.filter((i) => i.asked), ...all.filter((i) => !i.asked)], MATCH_MAX);
 }
 
 /**
@@ -216,30 +230,20 @@ export function pagePeople(found: readonly { readonly ask: SidedPost }[], maker:
   const name = (s: string | null | undefined): string => (s ?? "").trim().replace(/^@/, "").toLowerCase();
   const seen = new Set<string>([name(maker)]);
   const kept = found.map((f) => f.ask).filter((p) => p.author && !seen.has(name(p.author)) && seen.add(name(p.author)) && spoken(words(p, 200)) && !saysLittle(p) && !needsCustomers(p));
-  return [...kept.filter((p) => p.tell !== false), ...kept.filter((p) => p.tell === false)].slice(0, MATCH_MAX).map((p) => ({ author: p.author!, quote: quoteOf(p), url: p.url }));
+  return acrossSites([...kept.filter((p) => p.tell !== false), ...kept.filter((p) => p.tell === false)], MATCH_MAX).map((p) => ({ author: p.author!, quote: quoteOf(p), url: p.url }));
 }
 
 /**
  * Back to the maker with their page: everyone their link went to, on one address of Quest's own, so nothing about the
  * product is said (the founder, 2026-11-17: "we don't have to mention messaging quest, because there will be a branded
- * link on the page"). Goes as written.
+ * link on the page"). Goes as written, very short, with pictures of a few of the posts beside it (the founder,
+ * 2026-11-20: "Very short message (maybe with an emoji), few screenshots and a match link").
  */
-export function pageDraft(link: string, people: number, name: string | null = null, roll: () => number = Math.random, fits = 0): string {
-  const n = people === 1 ? "1 person" : `${people} people`;
-  const signed = (said: string): string => (name ? `${said}\n${pick([`I'm ${name} btw`, `${name} here btw`], roll)}` : said);
+export function pageDraft(link: string, people: number, _name: string | null = null, roll: () => number = Math.random, fits = 0): string {
+  const all = people + fits;
   // Nobody asked for such a thing, so nobody was written to: the page is the people and their posts, theirs to say hi to.
-  if (!people) return signed(pick([`Put them on a page for you, with their posts: ${link}`, `Here they are with their posts ${link}`, `Made you a page with who they are and what they posted ${link}`], roll));
-  if (fits) return signed(pick([`Done, sent your link to ${n} who asked. They're on this page with ${fits} more who might fit: ${link}`, `Sent it to ${n} who asked for it, and put them on a page with ${fits} more who might fit ${link}`], roll));
-  const done = pick(
-    [
-      `Done, sent your link to ${n}. All of them with their posts are here: ${link}`,
-      `Sent it to ${n}, put them on a page for you ${link}`,
-      `Did it, ${n} got your link. Made you a page with who they are and what they posted ${link}`,
-      `Done. ${n === "1 person" ? "The person" : `All ${people}`} and their posts are on this page ${link}`,
-    ],
-    roll,
-  );
-  return name ? `${done}\n${pick([`I'm ${name} btw`, `${name} here btw`], roll)}` : done;
+  if (!people) return pick([`Here they are. 👇\n${link}`, `Found ${all}.\n${link}`, `${all} so far. 👀\n${link}`, `These ${all}.\n${link}`], roll);
+  return pick([`Done. 🙌\n${link}`, `Sent, all here.\n${link}`, `Done, ${all} on this.\n${link}`, `Done. 👇\n${link}`], roll);
 }
 
 /** The last step, on their next answer whatever it says: the name, and the one ask back (the founder: "It is called Messaging Quest. Id really appreciate your feedback thanks!"). */

@@ -133,13 +133,60 @@ export function typedCheck(text) {
   return { ok: clean(el.value) === clean(text), held: clean(el.value).slice(0, 200) };
 }
 
+/**
+ * The box of the post whose words hold `quote`, scrolled to the middle of the screen: the smallest post-like element
+ * that holds the quote's start, else the element holding it, widened to a post's size. Self-contained: Chrome
+ * serializes this function. Null when the page does not show it.
+ */
+export function postBox(quote) {
+  const norm = (s) => String(s ?? "").replace(/[“”"…]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+  const want = norm(quote).slice(0, 40);
+  if (want.length < 8) return null;
+  const POSTS = 'article,[role="article"],[role="listitem"],shreddit-post,shreddit-comment,[data-testid="tweet"],[data-testid^="postThreadItem"],[data-testid^="feedItem"],[data-pressable-container],.feed-shared-update-v2,.athing,.comtr';
+  let best = null;
+  for (const el of document.querySelectorAll(POSTS)) {
+    if (!norm(el.innerText).includes(want)) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 200 || r.height < 40) continue;
+    if (!best || r.width * r.height < best.area) best = { el, area: r.width * r.height };
+  }
+  let el = best?.el ?? null;
+  if (!el) {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n && !el; n = walker.nextNode()) if (norm(n.textContent).includes(want.slice(0, 24))) el = n.parentElement;
+    for (let up = 0; el && up < 8 && el.getBoundingClientRect().height < 120; up++) el = el.parentElement;
+  }
+  if (!el) return null;
+  el.scrollIntoView({ block: "center", inline: "nearest" });
+  const r = el.getBoundingClientRect();
+  const x = Math.max(0, r.left), y = Math.max(0, r.top);
+  return { x, y, width: Math.min(r.right, innerWidth) - x, height: Math.min(r.bottom, innerHeight, y + 1100) - y, vw: innerWidth, vh: innerHeight };
+}
+
+/** The tab's picture cut to a box in its CSS pixels (from postBox), with a little room round it, as a jpeg data URL. */
+export async function cropPicture(picture, box) {
+  const bytes = Uint8Array.from(atob(picture.image.split(",")[1]), (c) => c.charCodeAt(0));
+  const bitmap = await createImageBitmap(new Blob([bytes], { type: "image/jpeg" }));
+  const sx = bitmap.width / box.vw, sy = bitmap.height / box.vh, pad = 6;
+  const x = Math.max(0, (box.x - pad) * sx), y = Math.max(0, (box.y - pad) * sy);
+  const w = Math.min(bitmap.width - x, (box.width + 2 * pad) * sx), h = Math.min(bitmap.height - y, (box.height + 2 * pad) * sy);
+  const canvas = new OffscreenCanvas(Math.max(1, Math.round(w)), Math.max(1, Math.round(h)));
+  canvas.getContext("2d").drawImage(bitmap, x, y, w, h, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.88 });
+  const buf = new Uint8Array(await blob.arrayBuffer());
+  let bin = "";
+  for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+  return { image: `data:image/jpeg;base64,${btoa(bin)}`, width: canvas.width, height: canvas.height };
+}
+
 /** Picture of the task tab, with pixel dimensions for unambiguous model coordinates. */
-export async function visualPicture(api, tabId) {
+export async function visualPicture(api, tabId, quality = 60) {
   const target = { tabId };
   await hold(api, tabId);
   const layout = await api.sendCommand(target, "Page.getLayoutMetrics", {});
   const viewport = layout.cssVisualViewport ?? layout.visualViewport;
-  const picture = await api.sendCommand(target, "Page.captureScreenshot", { format: "jpeg", quality: 60, captureBeyondViewport: false, fromSurface: true });
+  const picture = await api.sendCommand(target, "Page.captureScreenshot", { format: "jpeg", quality, captureBeyondViewport: false, fromSurface: true });
   const bytes = Uint8Array.from(atob(picture.data), c => c.charCodeAt(0));
   const bitmap = await createImageBitmap(new Blob([bytes], { type: "image/jpeg" }));
   const width = bitmap.width, height = bitmap.height;

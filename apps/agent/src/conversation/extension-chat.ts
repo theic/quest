@@ -41,7 +41,8 @@ export interface ChatView {
 const button = (b: TgInlineButton): WebButton =>
   "callback_data" in b ? { label: b.text, data: b.callback_data } : "url" in b ? { label: b.text, url: b.url } : { label: b.text, url: b.web_app.url };
 
-const LINK_LINE = /^\[[^\]\n]{1,60}\]$/;
+/** A links message's button as the transcript keeps it: "[Label](address)", or "[Label]" from before the address was kept. */
+const LINK_LINE = /^\[([^\]\n]{1,60})\](?:\((https?:\/\/\S+)\))?$/;
 
 export interface ExtensionChatDeps {
   readonly customers: CustomerRepository;
@@ -105,9 +106,15 @@ export class ExtensionChat {
     // How the chat began ("/start") is no words of theirs.
     // A card's note ("🔎 Draft, your message to ...") says again what the card in front shows.
     const messages = entries.filter((e) => !(e.direction === "in" && /^\/start\b/.test(e.text)) && !(e.direction === "out" && e.text.startsWith(CARD_MARK))).map((e): ChatLine => {
-      const buttons = (e.ref && state.buttons.get(e.ref)) || [];
       const lines = e.text.split("\n");
-      // A links message is kept as its words and "[Label]" lines: here the labels are its buttons.
+      // A links message is kept as its words and "[Label](address)" lines: here they are its buttons, also after a
+      // restart, when the buttons kept in memory are gone (live, 2026-11-20: "Tonight's report [Open the report]" had no link).
+      const kept = (e.ref && state.buttons.get(e.ref)) || [];
+      const fromLines = lines.flatMap((l): WebButton[] => {
+        const m = LINK_LINE.exec(l.trim());
+        return m?.[2] ? [{ label: m[1]!, url: m[2] }] : [];
+      });
+      const buttons = kept.length ? kept : fromLines;
       const text = (buttons.some((b) => "url" in b) ? lines.filter((l) => !LINK_LINE.test(l.trim())) : lines).join("\n").trim();
       const note = e.direction === "out" && (text.startsWith(CARD_MARK) || text.startsWith(DONE_MARK));
       return {

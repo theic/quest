@@ -63,7 +63,7 @@ const VISUAL = new Set(["click_point", "move_point", "type_text", "press_focused
  */
 export function frontFor(job) {
   const kind = job?.action?.kind;
-  if (VISUAL.has(kind) || kind === "screenshot") return "input";
+  if (VISUAL.has(kind) || kind === "screenshot" || kind === "shot") return "input";
   if (kind === "fill") return "type";
   if (kind === "close") return null;
   return job?.drawn === false ? null : "drawn";

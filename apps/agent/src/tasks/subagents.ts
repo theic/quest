@@ -29,7 +29,7 @@ export interface SubagentContext {
   /** People for a play, found by code (find_people). */
   readonly finder?: PlayFinder;
   /** A page of people asking for what someone built, made for them (page_for): its address and how many are on it, or why not. */
-  readonly pageFor?: (who: { readonly maker: string; readonly url: string; readonly made: string }) => Promise<{ readonly link: string; readonly people: number } | string>;
+  readonly pageFor?: (who: { readonly maker: string; readonly url: string; readonly made: string }) => Promise<{ readonly link: string; readonly people: number; readonly shots?: readonly string[] } | string>;
   /** People who need each other, matched by code (find_pairs). */
   readonly pairs?: PairFinder;
   /** Everyone Quest came across for any customer, public background only (mq.known_people). */

@@ -98,7 +98,7 @@ Report the real outcome, including any published link, replies, blockers and the
           const out = await ctx.pageFor({ maker: maker.trim(), url, made: made.trim() }).catch((e: unknown) => (e instanceof Error ? e.message : String(e)));
           if (typeof out === "string") return `No page: ${out} Say nothing of a page to them; give one true thing about what they built instead.`;
           return `Their page, with ${out.people} ${out.people === 1 ? "person" : "people"} asking for that this week: ${out.link}
-Answer them with that address in one line, as it is (the words may say you found a few people asking for this and put them on a page). Set helps true. Nothing about the customer's product: the page carries the way on.`;
+Answer them under their post in a few words and that address, as it is: "Found you ${out.people}." or "Here they are." and the link, an emoji at most. Set helps true. Nothing about the customer's product: the page carries the way on.${out.shots?.length ? `\nPictures of ${out.shots.length} of their posts are ready: pass assets ${JSON.stringify(out.shots)} with that reply, so they see who before they open it.` : ""}`;
         },
         {
           name: "page_for",

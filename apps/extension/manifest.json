@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Messaging Quest",
   "short_name": "Quest",
-  "version": "0.16.0",
+  "version": "0.16.1",
   "description": "__MSG_description__",
   "homepage_url": "https://www.messaging.quest/",
   "default_locale": "en",

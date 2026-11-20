@@ -45,6 +45,7 @@ import { unstyled } from "../lib/voice.ts";
 import { platformOf } from "../platforms.ts";
 import { saysUnder18, UNDER_18_REFUSAL } from "./adults.ts";
 import { noRefusal, type Refusal, type SaidNo } from "../contacts/said-no.ts";
+import { elsewhere } from "../contacts/their-channel.ts";
 import { dayLimit, limitFreesAt } from "./day-limits.ts";
 import { tagLinks } from "./tagged-link.ts";
 import { platformName, type Autopilot } from "./autopilot.ts";
@@ -320,6 +321,9 @@ export class DraftService implements OutboxSender {
     if (!("platform" in req && req.theirs)) {
       const no = (await this.#toSomeoneWhoSaidNo(asked)) ?? (await this.#d.saidNo?.tagged(customerId, asked.text).catch(() => null)) ?? null;
       if (no) return noRefusal(no);
+      // Words that give an email or ask for a DM are answered there, never in the thread (contacts/their-channel.ts).
+      const other = asked.kind === "reply" || asked.kind === "message" ? elsewhere(asked.kind, asked.url, asked.quote) : null;
+      if (other) return other;
     }
     // Live, 2026-11-03: a like card on Threads pointed at a profile, so the poster could only guess which post it was for.
     if (asked.kind === "like" && profileAddress(asked.url)) return "A like goes on one post: open the post and give its own address, not the person's profile.";

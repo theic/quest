@@ -101,6 +101,10 @@ const Env = z.object({
   // the platforms they show up on, in turn. "1" on, "0" off; unset: on for dev (the founder, 2026-11-04: "much more
   // active ... exploring all the time"), off for production, where every run is paid for.
   ALWAYS_EXPLORING: z.enum(["0", "1"]).optional(),
+  // Only answering (the founder, 2026-11-20: "complete all hanging conversations, but don't start new ones"): the
+  // rotation starts only "who is waiting" and "comments" runs, the introducer writes nothing, and the manager starts
+  // nothing on its own. "1" on.
+  ANSWER_ONLY: z.enum(["0", "1"]).optional(),
   // Pages their Chrome reads in a day (the extension holds to what the agent says, x-mq-pages). Unset: 800, or 5,000
   // while always exploring (live, 2026-11-14: 3,000 were read by 20:20 UTC, and nothing was read until midnight).
   CHROME_PAGES_A_DAY: z.coerce.number().int().min(50).max(5_000).optional(),
@@ -157,6 +161,7 @@ export interface Config {
   /** Jobs their Chrome takes at once, each in a tab of its own; never two on one site. */
   readonly chromeTabs: number;
   readonly alwaysExploring: boolean;
+  readonly answerOnly: boolean;
   readonly chromePagesADay: number;
   /** Where the agent is reached from outside: the database's wake job, and the links in the Chrome setup. */
   readonly publicUrl: string | null;
@@ -234,6 +239,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     cardsAtOnce: e.CARDS_AT_ONCE,
     chromeTabs: e.CHROME_TABS,
     alwaysExploring: always,
+    answerOnly: e.ANSWER_ONLY === "1",
     chromePagesADay: e.CHROME_PAGES_A_DAY ?? (always ? 5_000 : 800),
     publicUrl,
     wakeUrl: stage === "production" ? publicUrl : null,

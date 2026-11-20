@@ -23,10 +23,10 @@
       .who span:last-child { color: var(--muted); font-weight: 400; font-size: 13px; white-space: nowrap; }
       .said { margin: 4px 0 0; color: var(--muted); overflow-wrap: anywhere; }
       .none { color: var(--muted); }
-      .more { margin-top: 28px; }
-      .more a { display: block; text-align: center; padding: 14px 16px; border-radius: 14px; background: var(--accent); color: #0b0c0b; font-weight: 600; text-decoration: none; }
-      .more a:hover, .more a:focus-visible { filter: brightness(1.08); outline: 2px solid var(--ink); outline-offset: 2px; }
-      .more p { margin: 10px 0 0; color: var(--muted); font-size: 14px; text-align: center; }
+      .more { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+      .more p { margin: 0; color: var(--muted); font-size: 14px; }
+      .more a { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink); font-size: 14px; text-decoration: none; white-space: nowrap; }
+      .more a:hover, .more a:focus-visible { border-color: var(--accent); outline: none; }
     </style>
   </head>
   <body>
@@ -37,7 +37,7 @@
       <h2 id="fithead" hidden>Might fit too</h2>
       <p class="sub" id="fitsub" hidden>They didn't ask for it, so nobody wrote to them. Their posts are here if you want to say hi.</p>
       <ol id="fits"></ol>
-      <div class="more" id="more" hidden><a id="morelink" href="https://www.messaging.quest/?utm_source=match">Find more people like these</a><p>New ones every day, and the first run is free.</p></div>
+      <div class="more" id="more" hidden><p>New people post like this every day.</p><a id="morelink" href="https://www.messaging.quest/?utm_source=match">Keep looking for me</a></div>
     </main>
     <script>
       // A maker's page: everyone their link went to, read by its code from the database that keeps it ("t" first: dev's).

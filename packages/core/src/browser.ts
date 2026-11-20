@@ -41,6 +41,8 @@ export interface BrowserView {
   readonly dialog?: string;
   /** Current task-tab picture for visual controls. Kept in memory; never transcript/checkpoints. */
   readonly screen?: BrowserScreen;
+  /** A picture of one post on the page, cut to its box (`shot`): what goes with a reply that lists people. */
+  readonly shot?: { readonly image: string; readonly width: number; readonly height: number };
   /** Text transcribed from pixels can include a draft; it is not a delivery receipt. */
   readonly visualText?: boolean;
 }
@@ -55,6 +57,8 @@ export interface BrowserScreen {
 export type BrowserAction =
   | { readonly kind: "snapshot" }
   | { readonly kind: "screenshot" }
+  /** A picture of the post whose words start with `quote`, cut to its box (code only, never a model's step). */
+  | { readonly kind: "shot"; readonly quote: string }
   | { readonly kind: "click_point"; readonly screen: string; readonly x: number; readonly y: number }
   | { readonly kind: "move_point"; readonly screen: string; readonly x: number; readonly y: number }
   | { readonly kind: "type_text"; readonly screen: string; readonly text: string; readonly method?: "text" | "keys" }

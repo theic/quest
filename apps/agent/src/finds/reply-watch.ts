@@ -28,6 +28,15 @@ import { quoteAppears } from "../tasks/seen-pages.ts";
 import type { AnswerReader, Heard } from "./answer-reader.ts";
 import { blueskyAnswers, blueskyPost } from "./bluesky-answers.ts";
 import { modelRest } from "../lib/model-rest.ts";
+import { emailIn, theirChannel } from "../contacts/their-channel.ts";
+
+/** An answer's words as a short quote, kept round an email they gave, which a cut at the start would lose. */
+const quoteOf = (text: string): string => {
+  const s = text.replace(/\s+/g, " ");
+  const e = emailIn(s);
+  const at = e ? s.indexOf(e) + e.length : 0;
+  return clip(at > 160 ? s.slice(at - 160) : s, 160);
+};
 
 /**
  * When Quest looks at a posted reply again, counted from when it went up: fifteen minutes (a
@@ -617,14 +626,14 @@ export class ReplyWatch implements Loop {
     const stepped = new Set<Heard>();
     for (const h of planOf.keys()) {
       const url = addressOf(h);
-      if (url && this.#d.nextStep && (await this.#d.nextStep(first.customerId, { url, author: h.author, quote: clip(h.text.replace(/\s+/g, " "), 160), plan: planOf.get(h)! }).catch(() => false))) stepped.add(h);
+      if (url && this.#d.nextStep && (await this.#d.nextStep(first.customerId, { url, author: h.author, quote: quoteOf(h.text), plan: planOf.get(h)! }).catch(() => false))) stepped.add(h);
     }
     // Everyone who answered hears back (live, 2026-11-13: of about 60 answers in three days some 45 got nothing, questions
     // among them, while the manager was left to choose). A question is owed words, which the turn writes from what it knows;
     // anything else gets a like on the answer, by code, where the answer has an address of its own to put it on.
     // A yes to "want the link?" is owed the link, never only a like.
     const yes = (h: Heard): boolean => h.to !== null && offersIt(group[h.to]!.said) && saysYes(h.text);
-    const asks = (h: Heard): boolean => yes(h) || /\?/.test(h.text) || /^\W*(how|what|why|where|when|which|who|do|does|did|is|are|can|could|would|will|any)\b/i.test(h.text.trim());
+    const asks = (h: Heard): boolean => yes(h) || theirChannel(h.text) !== null || /\?/.test(h.text) || /^\W*(how|what|why|where|when|which|who|do|does|did|is|are|can|could|would|will|any)\b/i.test(h.text.trim());
     const liked = new Set<Heard>();
     for (const h of fresh) {
       const url = addressOf(h);
@@ -656,6 +665,14 @@ export class ReplyWatch implements Loop {
         `${fresh.length === 1 ? "Someone answered" : `${fresh.length} answers came to`} what went up as the customer on ${first.where}, read on ${where}:`,
         ...lines,
         ...(no.size ? [`ASKED TO BE LEFT ALONE: ${[...no].map((h) => handle(h.author)).join(", ")}. Kept for good, and what waited for them is skipped by code. Draft nothing for them, not an apology either, and name them under nobody's post.`] : []),
+        ...fresh
+          .filter((h) => !no.has(h) && !stepped.has(h) && theirChannel(h.text))
+          .map((h) => {
+            const c = theirChannel(h.text)!;
+            return typeof c === "object"
+              ? `ASKED TO BE EMAILED: ${handle(h.author)} gave ${c.email}. Answer them by email (kind message to Gmail's compose address for it, a subject in title), never in the thread.`
+              : `ASKED FOR A PRIVATE MESSAGE: ${handle(h.author)}. Answer them in a message to their profile, never in the thread.`;
+          }),
         ...(liked.size ? [`Already liked by code, nothing more owed: ${[...liked].map((h) => handle(h.author)).join(", ")}.`] : []),
         ...(owedWords.length
           ? [`OWED AN ANSWER, each of them, in this turn: ${owedWords.map((h) => handle(h.author)).join(", ")} asked something${owedWords.some(yes) ? `, or said yes to the link they were offered (${owedWords.filter(yes).map((h) => handle(h.author)).join(", ")}: the reply is their site's link, the product's name and that the first run is free, in a line)` : ""}. Draft a reply (kind reply, the answer's own address, a short quote of it) that answers what they asked, truly and from what you know; the product's name and link only if they asked where or what it is, or said yes to that offer. Never leave one of them with nothing.`]

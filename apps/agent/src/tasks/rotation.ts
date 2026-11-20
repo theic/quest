@@ -83,6 +83,8 @@ export interface RotationDeps {
   readonly sending?: (customerId: CustomerId) => Promise<boolean>;
   /** Runs of theirs that may be at work at once. */
   readonly perCustomer: number;
+  /** Only the runs that answer people (config ANSWER_ONLY): no platform's outreach, posts or other extras. */
+  readonly answerOnly?: boolean;
   readonly now: () => Date;
   readonly log: Logger;
 }
@@ -542,6 +544,7 @@ export function nextExtra(
   picked: readonly Platform[],
   x: { tasks: readonly Task[]; drafts: readonly Draft[]; avoided: ReadonlySet<string>; now: Date; results?: readonly ResultEntry[] },
   platformOpen: boolean,
+  answerOnly = false,
 ): Extra | null {
   const now = x.now.getTime();
   const day = now - DAY_MS;
@@ -580,6 +583,14 @@ export function nextExtra(
   };
   const byTitle = new Map(picked.map((p) => [p.name, p]));
   const platformOf = (e: Extra): Platform | undefined => byTitle.get(e.title.slice(0, e.title.indexOf(":")));
+  // Only answering: each platform's answers and comments once on the short clock, nothing else.
+  if (answerOnly) {
+    const due = [...waits, ...comments]
+      .map((e) => ({ ...e, every: e.title.endsWith(WAITS) ? WAITING_EVERY_MS : UNDER_POSTS_EVERY_MS }))
+      .filter((e) => now - lastStarted(x.tasks, e.title) >= e.every)
+      .sort((a, b) => lastStarted(x.tasks, a.title) - lastStarted(x.tasks, b.title));
+    return due[0] ?? null;
+  }
   for (const e of [...waits, ...comments]) {
     if (e.every === WAITING_EVERY_MS || e.every === UNDER_POSTS_EVERY_MS) {
       if (!answeredSince(e.title, platformOf(e))) (e as { every: number }).every = e.title.endsWith(WAITS) ? INBOX_EVERY_MS : UNDER_OLD_POSTS_EVERY_MS;
@@ -677,8 +688,9 @@ export class Rotation implements Loop {
     const drafts = await d.drafts.recent(customerId, 300);
     const results = d.results ? await d.results.list(customerId, 500).catch(() => []) : [];
     const x = { tasks, drafts, avoided, now, results };
-    const p = nextPlatform(picked, x);
-    const extra = full ? null : nextExtra(picked, x, p !== null);
+    const p = d.answerOnly ? null : nextPlatform(picked, x);
+    const extra = full ? null : nextExtra(picked, x, p !== null, d.answerOnly);
+    if (d.answerOnly && !extra) return this.#why(customerId, "only answering: nobody due");
     if (extra) {
       // Its place in the queue: answering who waits first, introductions with asked-for work, the rest as routine.
       // A post of their own may brag only with figures counted from the records.

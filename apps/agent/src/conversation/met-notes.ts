@@ -3,7 +3,7 @@
  * and its customers arrive on production, so a code made in one database is asked of that database's public functions
  * (the same ones the maker's page reads): only what the page or the thread already showed.
  *
- * - `m_<page code>`: they pressed "Find more people like these" on a page Quest made for them (/m/<code>).
+ * - `m_<page code>`: they pressed "Keep looking for me" on a page Quest made for them (/m/<code>).
  * - `t<code>`: a link Quest gave them in a thread or a message on dev (drafts hand-off), a "t" before dev's code.
  */
 const DB = {
@@ -33,7 +33,7 @@ export async function metNote(code: string, get: Fetch = fetch): Promise<string 
       if (!row?.launch) return null;
       const people = (row.people ?? []).slice(0, 6).map((p) => `${short(p.author, 40)} (${short(p.url, 160)}): "${short(p.quote, 140)}"${p.fit ? " (might fit, not written to)" : ""}`);
       return [
-        `On a public page Quest made for them (messaging.quest/m/${page}), they pressed "Find more people like these".`,
+        `On a public page Quest made for them (messaging.quest/m/${page}), they pressed "Keep looking for me".`,
         `They are ${short(row.maker, 80)}; what they made, from their own post ${short(row.launch, 200)}: ${short(row.made, 300) || "see the post"}.`,
         people.length ? `Already found for them: ${people.join("; ")}.` : null,
         "They want more people like those. They have not said their site: read their post for it, or ask for the link in one line.",

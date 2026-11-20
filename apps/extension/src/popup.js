@@ -202,39 +202,54 @@ const show = (next) => {
   if (last) draw(last);
 };
 
-/** What waits on them, drawn again only when it changed, so a press in flight is not reset. */
-let asksKey = "";
-/** What waits on them, a plain list above the box to write in: each with its words and its own buttons. */
-function drawAsks(asks) {
-  $("asks").hidden = !asks.length;
-  const key = JSON.stringify(asks);
-  if (key === asksKey) return;
-  asksKey = key;
-  $("asks-sum").textContent = `${t("Waiting for you")} · ${asks.length}`;
-  const list = $("asks-list");
-  list.replaceChildren();
-  for (const a of asks) {
-    const li = document.createElement("li");
-    if (a.link) li.append(Object.assign(document.createElement("a"), { className: "to", href: a.link.url, target: "_blank", rel: "noopener", textContent: a.link.label }));
-    if (a.head) li.append(Object.assign(document.createElement("p"), { className: "head", textContent: a.head }));
-    if (a.quote) li.append(Object.assign(document.createElement("p"), { className: "quote", textContent: a.quote }));
-    const words = Object.assign(document.createElement("div"), { className: "words" });
-    if (a.text !== null && a.text !== undefined) linked(words, a.text);
-    else safeHtml(words, a.html ?? "");
-    li.append(words);
-    const box = Object.assign(document.createElement("div"), { className: "buttons" });
-    for (const b of a.buttons) {
-      const el = Object.assign(document.createElement("button"), { type: "button", textContent: b.text ?? b.label });
-      // Edit asks what should change: the box to write in takes the words.
-      el.addEventListener("click", () => {
-        wantsFocus = /(:|^)edit/i.test(b.data);
-        for (const x of box.querySelectorAll("button")) x.disabled = true;
-        void press(b.data, null);
-      });
-      box.append(el);
-    }
-    li.append(box);
-    list.append(li);
+/** How many asks the chat shows before "more" (the founder, 2026-11-20: the cards go in the chat itself, like in Telegram). */
+const ASKS_SHOWN = 3;
+/** Whether they opened the rest of what waits. */
+let asksOpen = false;
+
+/** One thing waiting on them, as a card in the chat from Quest: where it goes, what it answers, the words, its buttons. */
+function askCard(a) {
+  const card = Object.assign(document.createElement("div"), { className: "msg quest ask" });
+  if (a.link) card.append(Object.assign(document.createElement("a"), { className: "to", href: a.link.url, target: "_blank", rel: "noopener", textContent: a.link.label }));
+  if (a.head) card.append(Object.assign(document.createElement("p"), { className: "head", textContent: a.head }));
+  if (a.quote) {
+    const q = Object.assign(document.createElement("p"), { className: "quote", textContent: a.quote });
+    q.addEventListener("click", () => q.classList.toggle("open"));
+    card.append(q);
+  }
+  const words = Object.assign(document.createElement("div"), { className: "words" });
+  if (a.text !== null && a.text !== undefined) linked(words, a.text);
+  else safeHtml(words, a.html ?? "");
+  card.append(words);
+  const box = Object.assign(document.createElement("div"), { className: "buttons" });
+  for (const b of a.buttons) {
+    const el = Object.assign(document.createElement("button"), { type: "button", textContent: b.text ?? b.label });
+    // Edit asks what should change: the box to write in takes the words.
+    el.addEventListener("click", () => {
+      wantsFocus = /(:|^)edit/i.test(b.data);
+      for (const x of box.querySelectorAll("button")) x.disabled = true;
+      void press(b.data, null);
+    });
+    box.append(el);
+  }
+  card.append(box);
+  return card;
+}
+
+/** What waits on them, at the end of the chat: a line, the first few cards, and the rest behind one press. */
+function drawAsks(list, asks) {
+  if (!asks.length) return;
+  list.append(Object.assign(document.createElement("div"), { className: "msg note", textContent: `${t("Waiting for you")} · ${asks.length}` }));
+  const shown = asksOpen ? asks : asks.slice(0, ASKS_SHOWN);
+  for (const a of shown) list.append(askCard(a));
+  if (asks.length > shown.length) {
+    const more = Object.assign(document.createElement("button"), { type: "button", className: "more-asks", textContent: `${t("Show more")} · ${asks.length - shown.length}` });
+    more.addEventListener("click", () => {
+      asksOpen = true;
+      drawnKey = "";
+      if (last) draw(last);
+    });
+    list.append(more);
   }
 }
 
@@ -257,8 +272,8 @@ function draw(chat) {
     seen = seenKey;
     void ask({ type: "seen", at: latest?.at ?? null, asks: asks.length }).catch(() => undefined);
   }
-  drawAsks(asks);
-  const key = JSON.stringify([messages.map((m) => [m.ref, m.text, m.reaction, m.buttons.length]), chat.typing, view]);
+  $("asks").hidden = true;
+  const key = JSON.stringify([messages.map((m) => [m.ref, m.text, m.reaction, m.buttons.length]), chat.typing, view, asks, asksOpen]);
   if (key !== drawnKey && view === "chat") {
     drawnKey = key;
     const list = $("chat");
@@ -276,6 +291,7 @@ function draw(chat) {
       }
       list.append(el);
     }
+    drawAsks(list, asks);
     if (chat.typing) list.append(Object.assign(document.createElement("div"), { className: "msg quest typing", textContent: t("typing…") }));
     if (atEnd || !list.dataset.drawn) list.scrollTop = list.scrollHeight;
     list.dataset.drawn = "1";
