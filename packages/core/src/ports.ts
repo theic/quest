@@ -452,6 +452,11 @@ export interface ChatChannel {
   showIdeaDecided(to: ChannelAddress, ref: string, idea: Idea): Promise<void>;
   /** A message with one button that switches Quest on (`on`) or off. */
   sendSwitch(to: ChannelAddress, text: string, on: boolean): Promise<string | null>;
+  /**
+   * The switch's messages here (`refs`, its last and a pinned one), redrawn to say how things stand now, so a switch
+   * made elsewhere (the panel, the Mini App) never leaves an old button here.
+   */
+  redrawSwitch?(to: ChannelAddress, refs: readonly string[], text: string, on: boolean): Promise<void>;
   /** A message with buttons that open web pages (the Chrome setup). */
   sendLinks(to: ChannelAddress, text: string, links: readonly OutgoingLink[]): Promise<string | null>;
   /** The language choice, the first thing someone new sees: `detected` (their Telegram's) first, a button each. */

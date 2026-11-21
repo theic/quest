@@ -247,6 +247,11 @@ scripts/        secrets and setup. They print names, never values.
   (`turn-input.ts` `offLine`): answer from what it knows, open nothing, promise nothing. Every other event waits for
   on, when the manager gets `switched_on`. A trial that ended is the one off that stops the manager too (`Power.quiet`).
   Known in memory too (loaded at start) for the broker and autopilot.
+  - **One state everywhere** (the founder, 2026-11-20: "The turn off switch in Telegram is not synced with the browser,
+    mini app's and current state"). Telegram's switch message is redrawn on every change, wherever it was made
+    (`Messenger.redrawSwitch`: the last 8 switch messages in the transcript, the chat's pin, one pinned for themselves alone, and a message with no text by its caption or button), and a press there turns
+    it in place instead of sending another. The Mini App asks `/glass/power` with no `on` every 5 s while in view (from
+    memory), and the panel follows every poll's `x-mq-off`.
   - **In the extension** (0.12.11): the first switch of its popup, "Quest is on", one click on Quest's icon in the Chrome
     it works in (`POST /chrome/power`, the extension's token; the same `Power.set`). Off, Quest's tabs close at once
     and the icon's badge says "OFF" (`switched` in `background.js`, also told by every poll's `x-mq-off`). The header
@@ -356,8 +361,11 @@ and its reCAPTCHA. A page whose own document answers 429 is `rate_limited` (wait
   composer's file field, `attachFile`) before it may publish; an older extension stops it as `outdated`.
 - **An evening report.** At the customer's report hour (20:00 in `mq.customers.timezone`, UTC until Quest learns it
   with `set_timezone`) the heartbeat loop queues a `day_report` event; the turn gets the day's record counted from the
-  database (`DayLedger`) and sends the report. The report is a page too (`manager/day-report.ts`, `reportHtml`): who answered,
-  what went up where (a table), what worked this week and a sample, kept in `mq.reports` for 60 days and sent as one button,
+  database (`DayLedger`) and sends the report. The report is a page too (`manager/day-report.ts`, `reportHtml`), charts first
+  (the founder, 2026-11-20: "charts, not just text ... interactive infographics first"): tiles (answered today against a
+  usual day, what went up, the week's answer rate), the last 14 days (7 at a tap), where people answer, today by the hour,
+  today on each site by kind, and how far people got, each with a tooltip on hover or tap (`PgReports.charts`); then who
+  answered, what needs them and a sample, kept in `mq.reports` for 60 days and sent as one button,
   "Open the report" (`GET /report/<token>/<day>`, signed like the credits page; `scripts/try-report.ts` makes one now).
   `mq.next_report_at()` is the one clock for it, used by both the queue and
   `mq.next_work_at()`, so a sleeping agent is woken for it. Experiments as a table of their own were cut (2026-11-19).

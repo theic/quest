@@ -65,7 +65,7 @@ export interface DayBudget {
 
 /** The off switch (lifecycle/power.ts): /off, /on, the button under each, and the note that a message waits. */
 export interface PowerSwitch {
-  set(customerId: CustomerId, on: boolean, from: "chat" | "tap"): Promise<boolean>;
+  set(customerId: CustomerId, on: boolean, from: "chat" | "tap", pressed?: string | null): Promise<boolean>;
 }
 
 /** Their ideas and assets (ideas/idea-service.ts): a tap on an idea's card, and a picture or video kept for their posts. */
@@ -236,7 +236,7 @@ export class InboundService {
     }
 
     if (inbound.type === "power") {
-      const changed = this.#power ? await this.#power.set(customer.id, inbound.on, "tap") : false;
+      const changed = this.#power ? await this.#power.set(customer.id, inbound.on, "tap", inbound.messageRef ?? null) : false;
       await this.#channels.get(kind).acknowledge(inbound.ackRef, tr(changed ? (inbound.on ? "Quest is on" : "Browsing is off") : inbound.on ? "Already on" : "Already off"));
       return;
     }

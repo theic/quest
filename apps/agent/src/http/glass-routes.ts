@@ -62,7 +62,7 @@ export function glassRoutes(deps: {
   /** Their plan and the day's credits (billing/energy.ts). */
   energy?: Pick<Energy, "view">;
   /** The off switch at the top of the page (lifecycle/power.ts). */
-  power?: { set(customerId: CustomerId, on: boolean, from: "chat" | "page"): Promise<boolean> };
+  power?: { set(customerId: CustomerId, on: boolean, from: "chat" | "page"): Promise<boolean>; isOff(customerId: CustomerId): boolean };
   log: Logger;
   now?: () => number;
 }): Hono {
@@ -88,6 +88,8 @@ export function glassRoutes(deps: {
     const body = await c.req.raw.clone().json().catch(() => ({})) as { on?: unknown };
     const customer = await signedIn(c);
     if (customer instanceof Response) return customer;
+    // No `on`: how it stands now, from memory, so the page follows a switch made in the panel or in the chat.
+    if (deps.power && body.on === undefined) return c.json({ off: deps.power.isOff(customer.id) });
     if (!deps.power || typeof body.on !== "boolean") return c.json({ error: "Could not switch it." }, 400);
     await deps.power.set(customer.id, body.on, "page");
     return c.json({ off: !body.on });

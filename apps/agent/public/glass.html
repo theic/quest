@@ -261,6 +261,14 @@ await ready;
   function fresh(ms) { if (document.visibilityState === "visible" && Date.now() - loadedAt > ms) { loadedAt = Date.now(); load(); } }
   document.addEventListener("visibilitychange", function () { fresh(30000); });
   setInterval(function () { fresh(300000); }, 30000);
+  // The switch follows one made in the panel or in the chat: a small question every 5 s while the page is in view.
+  setInterval(function () {
+    if (!data || !tg || !tg.initData || document.visibilityState !== "visible" || powerBox.querySelector("button:disabled")) return;
+    fetch("/glass/power", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ initData: tg.initData }) })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && typeof j.off === "boolean" && j.off !== Boolean(data.off)) { data.off = j.off; drawPower(); } })
+      .catch(function () {});
+  }, 5000);
 })();
 </script>
 

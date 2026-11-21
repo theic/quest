@@ -92,6 +92,8 @@ export type Inbound =
       readonly from: Sender;
       readonly on: boolean;
       readonly ackRef: string;
+      /** The message the button is under, redrawn to how things stand. */
+      readonly messageRef?: string | null;
     }
   | {
       /** A file or picture they sent (a CV, a screenshot), with the words they sent it with. */

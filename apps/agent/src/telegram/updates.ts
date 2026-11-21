@@ -70,7 +70,7 @@ export function parseUpdate(update: TgUpdate): Inbound | null {
     const deck = DECK.exec(cq.data ?? "");
     if (deck?.[1] && deck[2]) return { type: "deck", from: senderOf(cq.from, chat), action: DECK_ACTIONS[deck[1] as keyof typeof DECK_ACTIONS], key: deck[2], ackRef: cq.id };
     const power = POWER.exec(cq.data ?? "")?.[1];
-    if (power) return { type: "power", from: senderOf(cq.from, chat), on: power === "on", ackRef: cq.id };
+    if (power) return { type: "power", from: senderOf(cq.from, chat), on: power === "on", ackRef: cq.id, messageRef: cq.message ? String(cq.message.message_id) : null };
     const m = CHOICE.exec(cq.data ?? "");
     if (!m || m[1] === undefined || m[2] === undefined) return null;
     return {

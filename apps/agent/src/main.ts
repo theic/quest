@@ -440,11 +440,13 @@ const turn = new ManagerTurn({
     const dayStart = since.getTime() > now.getTime() ? new Date(since.getTime() - 86_400_000) : since;
     const tz = c.timezone ?? "UTC";
     const dayKey = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
-    const [today, week, answered, recent] = await Promise.all([
+    const [today, week, answered, recent, charts] = await Promise.all([
       reports.platforms(id, dayStart),
       reports.platforms(id, new Date(now.getTime() - 7 * 86_400_000)),
       reports.answered(id, dayStart),
       transcript.recent(id, 6),
+      // The charts are a picture of the same numbers: a failure leaves the words.
+      reports.charts(id, new Date(dayStart.getTime() - 13 * 86_400_000), dayStart, tz).catch((e) => (log.warn("report.charts_failed", { customerId: id, error: String(e) }), undefined)),
     ]);
     const news = [...recent].reverse().find((e) => e.direction === "out")?.text ?? null;
     const html = reportHtml({
@@ -453,6 +455,7 @@ const turn = new ManagerTurn({
       answered,
       today,
       week,
+      ...(charts ? { charts } : {}),
       needs: needsYou(waiting),
       paused,
       sample: (daySample(sent, (words) => namesTheirs(words, c.siteUrl)) ?? "").split("\n").filter(Boolean),

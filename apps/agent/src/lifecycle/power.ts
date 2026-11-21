@@ -19,7 +19,7 @@ export const ON_SAID = "I'm back on, picking up where I left off.";
  */
 export interface PowerDeps {
   readonly customers: Pick<CustomerRepository, "get" | "update" | "switchedOff">;
-  readonly messenger: Pick<Messenger, "sendSwitch">;
+  readonly messenger: Pick<Messenger, "sendSwitch" | "redrawSwitch">;
   readonly events: EventSink;
   /** Their runs in flight stop when it goes off. */
   readonly runs?: { pause(customerId: CustomerId): void };
@@ -59,17 +59,22 @@ export class Power {
    * Switches Quest on or off for them. It is told in the chat with the button that switches it
    * back. False when it already was (a second tap, `/off` twice): then they hear nothing more.
    */
-  async set(customerId: CustomerId, on: boolean, from: "chat" | "page" | "tap"): Promise<boolean> {
+  async set(customerId: CustomerId, on: boolean, from: "chat" | "page" | "tap", pressed: string | null = null): Promise<boolean> {
     const was = Boolean((await this.#d.customers.get(customerId)).offAt);
     if (was === !on) {
       if (on) this.#off.delete(customerId);
       else this.#off.add(customerId);
+      // An old button pressed: it shows how things stand now.
+      if (pressed) await this.#d.messenger.redrawSwitch(customerId, on ? ON_SAID : OFF_SAID, !on, pressed, [ON_SAID, OFF_SAID]);
       return false;
     }
     const where = from === "page" ? "from their page" : "in the chat";
     await this.#apply(customerId, on, `switched ${on ? "on" : "off"} ${where}`, "They switched browsing back on. Pick up the work.");
     this.#d.log.info(on ? "power.on" : "power.off", { customerId, from });
-    await this.#d.messenger.sendSwitch(customerId, on ? ON_SAID : OFF_SAID, !on);
+    // Telegram's switch shows the new state, wherever they switched. A button pressed there turns in place, like a
+    // switch: its message is the news. Anywhere else, the news goes to the chat they use too.
+    await this.#d.messenger.redrawSwitch(customerId, on ? ON_SAID : OFF_SAID, !on, pressed, [ON_SAID, OFF_SAID]);
+    if (!pressed) await this.#d.messenger.sendSwitch(customerId, on ? ON_SAID : OFF_SAID, !on);
     return true;
   }
 

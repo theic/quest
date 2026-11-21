@@ -266,7 +266,41 @@ ${idea.status === "no" ? `${t("Not this one")}` : `${t("Writing it")}`}`), parse
 
   async sendSwitch(to: ChannelAddress, text: string, on: boolean): Promise<string | null> {
     const t = forLanguage(await this.#language(to));
-    return this.#send(to, text, [[{ text: t(on ? "Switch Quest on" : "Switch Quest off"), callback_data: powerData(on) }]]);
+    const ref = await this.#send(to, text, [[{ text: t(on ? "Switch Quest on" : "Switch Quest off"), callback_data: powerData(on) }]]);
+    if (ref) this.#switches.set(to.address, ref);
+    return ref;
+  }
+
+  /** The chat's last switch message, kept in memory: after a restart an old one is redrawn when it is pressed. */
+  readonly #switches = new Map<string, string>();
+
+  async redrawSwitch(to: ChannelAddress, given: readonly string[], text: string, on: boolean): Promise<void> {
+    const refs = new Set([...given, this.#switches.get(to.address)].filter((r): r is string => Boolean(r)));
+    // A switch they pinned to keep at hand (live, 2026-11-20: the pinned one still said "Browsing is off" while on).
+    const pinned = await this.#api.pinnedMessage(to.address).catch(() => null);
+    if (pinned?.reply_markup?.inline_keyboard?.some((row) => row.some((b) => "callback_data" in b && /^power:/.test(b.callback_data)))) refs.add(String(pinned.message_id));
+    const t = forLanguage(await this.#language(to));
+    const markup = { inline_keyboard: [[{ text: t(on ? "Switch Quest on" : "Switch Quest off"), callback_data: powerData(on) }]] };
+    const params = { chat_id: to.address, message_id: 0, parse_mode: "HTML", reply_markup: markup };
+    for (const at of refs) {
+      const id = Number(at);
+      // Its words, or its caption (the switch pinned on 2026-11-12 is a message with no text), else its button alone.
+      // The same words and button again, or a message gone: nothing to redraw.
+      const tries: (() => Promise<unknown>)[] = [
+        () => this.#api.call("editMessageText", { ...params, message_id: id, text: toTelegramHtml(text) }),
+        () => this.#api.call("editMessageCaption", { ...params, message_id: id, caption: toTelegramHtml(text) }),
+        () => this.#api.call("editMessageReplyMarkup", { chat_id: to.address, message_id: id, reply_markup: markup }),
+      ];
+      for (const attempt of tries) {
+        try {
+          await attempt();
+          break;
+        } catch (e) {
+          if (!(e instanceof TelegramError && e.code === 400)) throw e;
+          if (/not modified|not found/i.test(e.message)) break;
+        }
+      }
+    }
   }
 
   /**

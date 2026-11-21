@@ -175,6 +175,12 @@ export class TelegramBotApi {
   }
 
   /** Pins a message at the top of the chat. In a private chat Telegram also posts a note that it was pinned. */
+  /** The chat's pinned message, with its buttons. */
+  async pinnedMessage(chatId: string): Promise<(TgMessage & { reply_markup?: { inline_keyboard?: TgInlineButton[][] } }) | null> {
+    const chat = await this.call<{ pinned_message?: TgMessage & { reply_markup?: { inline_keyboard?: TgInlineButton[][] } } }>("getChat", { chat_id: chatId });
+    return chat.pinned_message ?? null;
+  }
+
   pinChatMessage(params: { chat_id: string; message_id: number; disable_notification?: boolean }): Promise<true> {
     return this.call<true>("pinChatMessage", params);
   }

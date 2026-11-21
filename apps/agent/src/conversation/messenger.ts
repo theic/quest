@@ -112,6 +112,29 @@ export class Messenger {
     await this.#transcript.recordOutgoing(customerId, to.kind, ref, text);
   }
 
+  /**
+   * Their Telegram's switch message (the one pressed, `ref`, else its last) redrawn to how things stand: switched in
+   * the panel or the Mini App, Telegram's button had kept saying the opposite (the founder, 2026-11-20).
+   */
+  async redrawSwitch(customerId: CustomerId, said: string, on: boolean, ref: string | null = null, every: readonly string[] = []): Promise<void> {
+    try {
+      const to = await this.#customers.channelOf(customerId, "telegram");
+      const channel = to ? this.#channels.get(to.kind) : null;
+      if (!to || !channel?.redrawSwitch) return;
+      const language = (await this.#customers.get(customerId)).language;
+      const text = plain(systemMessage(language, said));
+      // The switch messages of the last stretch, from the transcript, so a restart leaves none saying the opposite; far
+      // back, since one they pinned for themselves is not the chat's pin a bot can ask for (live, 2026-11-20: a switch
+      // pinned five hours and 25 messages before). A switch is rare, so the read is too.
+      const kinds = new Set(every.map((s) => plain(systemMessage(language, s))));
+      const refs = new Set((await this.#transcript.recent(customerId, 400)).filter((e) => e.direction === "out" && e.ref && /^\d+$/.test(e.ref) && kinds.has(e.text)).map((e) => e.ref!).slice(-8));
+      if (ref) refs.add(ref);
+      await channel.redrawSwitch(to, [...refs], text, on);
+    } catch (e) {
+      this.#log.warn("messenger.switch_redraw_failed", { customerId, error: e instanceof Error ? e.message : String(e) });
+    }
+  }
+
   /** A message with buttons that open web pages. */
   async sendLinks(customerId: CustomerId, text: string, links: readonly OutgoingLink[]): Promise<void> {
     const to = await this.#customers.primaryChannel(customerId);

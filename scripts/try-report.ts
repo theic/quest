@@ -23,11 +23,13 @@ const who = customerId(id);
 const now = new Date();
 const since = new Date(now.getTime() - Number(hours) * 3_600_000);
 const reports = new PgReports(pool);
-const [today, week, answered, sent] = await Promise.all([
+const tz = process.env["TZ_REPORT"] ?? "Europe/Lisbon";
+const [today, week, answered, sent, charts] = await Promise.all([
   reports.platforms(who, since),
   reports.platforms(who, new Date(now.getTime() - 7 * 86_400_000)),
   reports.answered(who, since),
   new PgDraftMarks(pool).sent(who, since),
+  reports.charts(who, new Date(since.getTime() - 13 * 86_400_000), since, tz),
 ]);
 const html = reportHtml({
   day: now.toDateString(),
@@ -35,6 +37,7 @@ const html = reportHtml({
   answered,
   today,
   week,
+  charts,
   needs: null,
   paused: [],
   sample: (daySample(sent, () => false) ?? "").split("\n").filter(Boolean),
