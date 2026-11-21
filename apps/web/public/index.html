@@ -115,6 +115,14 @@
     var u = n.userAgent;
     d.classList.add("js");
     d.dataset.device = /Android|iPhone|iPad|iPod|Mobi/i.test(u) || (n.maxTouchPoints > 1 && /Macintosh/.test(u)) ? "phone" : /\bChrome\//.test(u) ? "chrome" : "other";
+    // A link Quest gave them in a thread or a message carries their code (?i=): kept for the extension (landing.js).
+    try {
+      var i = new URLSearchParams(location.search).get("i");
+      if (i && /^[A-Za-z0-9_-]{4,64}$/.test(i)) localStorage.setItem("questInvite", i);
+      // From a page Quest made for them (/m/<code>, "Find more people like these"): the page's code goes the same way.
+      var m = new URLSearchParams(location.search).get("m");
+      if (m && /^t?[A-Fa-f0-9]{10}$/.test(m)) localStorage.setItem("questInvite", "m_" + m);
+    } catch (e) {}
   })(document.documentElement, navigator);
 </script>
 <script type="module" src="/landing-art.js"></script>
